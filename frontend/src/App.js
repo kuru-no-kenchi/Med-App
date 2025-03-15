@@ -1,0 +1,78 @@
+import './App.css';
+import '../node_modules/bootstrap/dist/css/bootstrap.min.css';
+import '../node_modules/bootstrap/dist/js/bootstrap.bundle.js';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+
+// Import Components
+import Home from './Home/Home.js';
+import About from './About/About.js';
+import AllDoctors from './AllDoctors/AllDoctors.js';
+import Contact from './Contact/Contact.js';
+
+// Import Admin Components
+import AdminLayout from './admin/AdminLayout.js';
+import Dashboard from './admin/dashboard/Dashboard.js';
+import Users from './admin/pages/users/Users.js';
+import UsersForm from './admin/pages/users/UsersForm.js';
+import AiAnalysis from './admin/pages/AiAnalysis.js';
+import DoctorsForm from './admin/pages/doctor/DoctorsForm.js';
+import AppointmentsForm from './admin/pages/appointments/AppointmentsForm.js';
+import HomeLayout from "./HomeLayout.js"
+import Doctors from './admin/pages/doctor/Doctors.js';
+import Appointments from './admin/pages/appointments/Appointments.js';
+import Messages from './admin/pages/Messages.js';
+import Settings from './admin/pages/Settings.js';
+import TodaysPreference from './admin/pages/TodaysPreference.js';
+import MyDoctor from './admin/pages/DoctorChat.js';
+import Profile from "./admin/pages/Profile.js";
+
+import Login from "./admin/pages/Login.js";
+import Register from "./admin/pages/Register.js";
+
+// Import App Context
+import AppContextProvider from './Context/AppContext.js';
+
+function App() {
+  return (
+    <div className="App">
+      <BrowserRouter>
+        <AppContextProvider>
+          <Routes>
+            {/* Public Routes */}
+          <Route path="/" element={<HomeLayout />} >
+
+            <Route  index element={<Home />} />
+            <Route  path="/Home" element={<Home />} />
+            <Route path="/About" element={<About />} />
+            <Route path="/AllDoctors" element={<AllDoctors />} />
+            <Route path="/doctors" element={<AllDoctors />} />
+            <Route path="/doctors/:speciality" element={<AllDoctors />} />
+            <Route path="/Contact" element={<Contact />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+          </Route>
+            {/* Admin Routes with Nested Routing */}
+            <Route path="/admin" element={<AdminLayout />}>
+              <Route index element={<Dashboard />} /> {/* Default child */}
+              <Route path="users/list" element={<Users />} />
+              <Route path="users/add" element={<UsersForm />} />
+              <Route path="ai-analysis" element={<AiAnalysis />} />
+
+              <Route path="doctors/list" element={<Doctors />} />
+              <Route path="doctors/add" element={<DoctorsForm />} />
+              <Route path="appointments/list" element={<Appointments />} />
+              <Route path="appointments/add" element={<AppointmentsForm />} />
+              <Route path="messages" element={<Messages />} />
+              <Route path="settings" element={<Settings />} />
+              <Route path="todays-preference" element={<TodaysPreference />} />
+              <Route path="my-doctor" element={<MyDoctor />} />
+              <Route path="profile" element={<Profile />} />
+            </Route>
+          </Routes>
+        </AppContextProvider>
+      </BrowserRouter>
+    </div>
+  );
+}
+
+export default App;
