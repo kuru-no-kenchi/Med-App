@@ -1,1 +1,1 @@
-# "Med_App" by phantom
+# "Med_App"
