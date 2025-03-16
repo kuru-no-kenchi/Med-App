@@ -1,41 +1,83 @@
-import React, { useState } from "react";
-import { Container, Table, Button, Form, Modal } from "react-bootstrap";
+import React, { useEffect, useState } from "react";
+import { Container, Table, Button, Modal } from "react-bootstrap";
 import { PencilSquare, Trash } from "react-bootstrap-icons";
 import UsersForm from "./UsersForm";
+import { getUsers, createUser, updateUser, deleteUser } from "./api_users";
 
 const Users = () => {
-  const [users, setUsers] = useState([
-    { fullName: "John Doe", email: "john.doe@example.com", dateRegistered: "2025-03-01", status: "Pending" },
-    { fullName: "Jane Smith", email: "jane.smith@example.com", dateRegistered: "2025-03-02", status: "Approved" },
-  ]);
+  const [users, setUsers] = useState({}); // Store users as an object
   const [showForm, setShowForm] = useState(false);
   const [editUser, setEditUser] = useState(null);
 
-  const handleAddUser = (user) => {
-    setUsers([...users, user]);
-    setShowForm(false);
+  useEffect(() => {
+    handleAllUsers();
+  },[] );
+
+  const handleAllUsers = async () => {
+    try {
+      const response = await getUsers();
+      const data = response.data;
+
+      // Transform array into an object
+      const usersObject = data.reduce((acc, user) => {
+        acc[user.id] = user;
+        return acc;
+      }, {});
+
+      setUsers(usersObject);
+    } catch (error) {
+      console.error("Error fetching users:", error);
+      setUsers({});
+    }
   };
 
-  const handleEditUser = (index) => {
-    setEditUser({ ...users[index], index });
-    setShowForm(true);
+  const handleSaveUser = async (user) => {
+    try {
+      if (editUser) { 
+        await updateUser(editUser.id, user);
+        setUsers((prevUsers) => ({
+          ...prevUsers,
+          [editUser.id]: { ...prevUsers[editUser.id], ...user },
+        }));
+      } else {
+        const response = await createUser(user);
+        const newUser = response.data;
+        setUsers((prevUsers) => ({
+          ...prevUsers,
+          [newUser.id]: newUser,
+        }));
+      }
+      setShowForm(false);
+      setEditUser(null);
+    } catch (error) {
+      console.error("Error saving user:", error);
+    }
+  };
+  const handleDeleteUser = async (id) => {
+    try {
+      await deleteUser(id);
+      setUsers((prevUsers) => {
+        const updatedUsers = { ...prevUsers };
+        delete updatedUsers[id];
+        return updatedUsers;
+      });
+    } catch (error) {
+      console.error("Error deleting user:", error);
+    }
   };
 
-  const handleDeleteUser = (index) => {
-    setUsers(users.filter((_, i) => i !== index));
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
   };
 
-  const handleSaveUser = (user) => {
-    const updatedUsers = [...users];
-    updatedUsers[user.index] = user;
-    setUsers(updatedUsers);
-    setShowForm(false);
-  };
 
   return (
     <Container>
       <h2 className="my-3">Users</h2>
-      <Button className="mb-3" onClick={() => setShowForm(true)}>Add User</Button>
+      <Button className="mb-3" onClick={() => { setEditUser(null); setShowForm(true); }}>
+        Add User
+      </Button>
       <Table striped bordered hover>
         <thead>
           <tr>
@@ -48,18 +90,27 @@ const Users = () => {
           </tr>
         </thead>
         <tbody>
-          {users.map((user, index) => (
-            <tr key={index}>
+          {Object.values(users).map((user, index) => (
+            <tr key={user.id}>
               <td>{index + 1}</td>
-              <td>{user.fullName}</td>
+              <td>{user.first_name+" "+user.last_name}</td>
               <td>{user.email}</td>
-              <td>{user.dateRegistered}</td>
+              <td>{formatDate(user.date_joined)}</td>
+              {/*<td>{user.role}</td> */}
               <td>{user.status}</td>
               <td>
-                <Button variant="warning" size="sm" className="me-2" onClick={() => handleEditUser(index)}>
+                <Button
+                  variant="warning"
+                  size="sm"
+                  className="me-2"
+                  onClick={() => {
+                    setEditUser(user);
+                    setShowForm(true);
+                  }}
+                >
                   <PencilSquare />
                 </Button>
-                <Button variant="danger" size="sm" onClick={() => handleDeleteUser(index)}>
+                <Button variant="danger" size="sm" onClick={() => handleDeleteUser(user.id)}>
                   <Trash />
                 </Button>
               </td>
@@ -75,7 +126,7 @@ const Users = () => {
         <Modal.Body>
           <UsersForm
             user={editUser}
-            onSave={editUser ? handleSaveUser : handleAddUser}
+            onSave={handleSaveUser}
             onCancel={() => setShowForm(false)}
           />
         </Modal.Body>

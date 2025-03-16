@@ -1,13 +1,29 @@
 import React, { useState } from "react";
 import { Form, Button, Container, Card } from "react-bootstrap";
+import axios from "axios";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log({ email, password }); // Replace this with API call
+    try {
+      const response = await axios.post("http://127.0.0.1:8000/auth/login/", {
+        email,
+        password,
+      });
+
+      // Store the authentication token in localStorage
+      localStorage.setItem("authToken", response.data.key);
+      alert("Login successful!");
+
+      // Redirect to another page after login (e.g., dashboard)
+      window.location.href = "/dashboard";
+    } catch (err) {
+      setError("Invalid email or password");
+    } // this is the API call
   };
 
   return (

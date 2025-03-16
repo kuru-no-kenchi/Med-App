@@ -9,16 +9,7 @@ class PatientSerializer(serializers.ModelSerializer):
     class Meta:
         model = Patient
         fields = ['full_name', 'medical_history', 'date_of_birth', 'insurance_number']  
-        
-class AppointmentSerializer(serializers.ModelSerializer):
-    patient_name = serializers.CharField(source='patient.full_name', read_only=True)
-    doctor_name = serializers.CharField(source='doctor.username', read_only=True)
-
-    class Meta:
-        model = Appointment
-        fields = '__all__'
-        
-
+          
 
 class MessageSerializer(serializers.ModelSerializer):
     sender_name = serializers.CharField(source='sender.username', read_only=True)
@@ -38,4 +29,26 @@ class DoctorSerializer(serializers.Serializer):
     specialization = serializers.CharField(source='user.doctor.specialization',read_only=True)
     class Meta:
         model = CustomUser
-        fields = ['full_name','hosp_name','experience','license_number','specialization']
+        fields = ['first_name','last_name','hosp_name','experience','license_number','specialization',"email"]
+
+class CustomUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        date_joined = serializers.DateTimeField(source='user.date_joined',format="%Y-%m-%d",read_only=True)
+        fields = ["id", "username","first_name","last_name", "email", "role","date_joined"]
+        
+class AssistantSerializer(serializers.Serializer):
+    full_name = serializers.CharField(source='user.get_full_name', read_only=True)
+    hosp_name = serializers.CharField(source='user.assistant.hospital_name', read_only=True)
+    experience = serializers.IntegerField(source='user.assistant.experience', read_only=True)
+    email = serializers.CharField(source='user.email', read_only=True)
+    class Meta:
+        model = CustomUser
+        fields = ['first_name','last_name','hosp_name','experience',"email"]
+class AppointmentSerializer(serializers.ModelSerializer):
+    doctor_name = serializers.CharField(read_only=True)
+    patient_name = serializers.CharField(read_only=True) 
+
+    class Meta:
+        model = Appointment
+        fields = ['id', 'doctor_name', 'patient_name', 'app_date', 'app_time', 'app_aprv', 'app_done']

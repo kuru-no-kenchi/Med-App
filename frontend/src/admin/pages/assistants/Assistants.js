@@ -1,65 +1,116 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Container, Table, Button, Modal } from "react-bootstrap";
 import { PencilSquare, Trash } from "react-bootstrap-icons";
 import AssistantsForm from "./AssistantsForm";
+import { getAssistants, createAssistant, updateAssistant, deleteAssistant } from "./api_assistants";
 
 const Assistants = () => {
-  const [assistants, setAssistants] = useState([
-    { name: "Alice Johnson", specialty: "Cardiology", dateRegistered: "2025-03-01", status: "Pending" },
-    { name: "Bob Brown", specialty: "Neurology", dateRegistered: "2025-03-02", status: "Approved" },
-  ]);
+  const [assistants, setAssistants] = useState({}); // Store assistants as an object
   const [showForm, setShowForm] = useState(false);
   const [editAssistant, setEditAssistant] = useState(null);
 
-  const handleAddAssistant = (assistant) => {
-    setAssistants([...assistants, assistant]);
-    setShowForm(false);
+  // Fetch all assistants on component mount
+  useEffect(() => {
+    getAllAssistants();
+  }, []);
+
+  // Fetch assistants from the backend
+  const getAllAssistants = async () => {
+    try {
+      const response = await getAssistants();
+      const data = response.data;
+
+      // Transform array into an object
+      const assistantsObject = data.reduce((acc, assistant) => {
+        acc[assistant.id] = assistant; // Use assistant.id as the key
+        return acc;
+      }, {});
+
+      setAssistants(assistantsObject);
+    } catch (error) {
+      console.error("Error fetching assistants:", error);
+      setAssistants({});
+    }
   };
 
-  const handleEditAssistant = (index) => {
-    setEditAssistant({ ...assistants[index], index });
-    setShowForm(true);
+  // Handle saving an assistant (create or update)
+  const handleSaveAssistant = async (assistantData) => {
+    try {
+      if (editAssistant) {
+        // Update existing assistant
+        await updateAssistant(editAssistant.id, assistantData);
+        setAssistants((prevAssistants) => ({
+          ...prevAssistants,
+          [editAssistant.id]: { ...prevAssistants[editAssistant.id], ...assistantData },
+        }));
+      } else {
+        // Create new assistant
+        const response = await createAssistant(assistantData);
+        const newAssistant = response.data;
+        setAssistants((prevAssistants) => ({
+          ...prevAssistants,
+          [newAssistant.id]: newAssistant,
+        }));
+      }
+      setShowForm(false);
+      setEditAssistant(null);
+    } catch (error) {
+      console.error("Error saving assistant:", error);
+    }
   };
 
-  const handleDeleteAssistant = (index) => {
-    setAssistants(assistants.filter((_, i) => i !== index));
-  };
-
-  const handleSaveAssistant = (assistant) => {
-    const updatedAssistants = [...assistants];
-    updatedAssistants[assistant.index] = assistant;
-    setAssistants(updatedAssistants);
-    setShowForm(false);
+  // Handle deleting an assistant
+  const handleDeleteAssistant = async (id) => {
+    try {
+      await deleteAssistant(id);
+      setAssistants((prevAssistants) => {
+        const updatedAssistants = { ...prevAssistants };
+        delete updatedAssistants[id]; // Remove the assistant with the given ID
+        return updatedAssistants;
+      });
+    } catch (error) {
+      console.error("Error deleting assistant:", error);
+    }
   };
 
   return (
     <Container>
       <h2 className="my-3">Assistants</h2>
-      <Button className="mb-3" onClick={() => setShowForm(true)}>Add Assistant</Button>
+      <Button className="mb-3" onClick={() => { setEditAssistant(null); setShowForm(true); }}>
+        Add Assistant
+      </Button>
       <Table striped bordered hover>
         <thead>
           <tr>
             <th>#</th>
-            <th>Name</th>
-            <th>Specialty</th>
-            <th>Date Registered</th>
-            <th>Status</th>
+            <th>Full Name</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Department</th>
             <th>Action</th>
           </tr>
         </thead>
         <tbody>
-          {assistants.map((assistant, index) => (
-            <tr key={index}>
+          {Object.values(assistants).map((assistant, index) => (
+            <tr key={assistant.id}>
               <td>{index + 1}</td>
-              <td>{assistant.name}</td>
-              <td>{assistant.specialty}</td>
-              <td>{assistant.dateRegistered}</td>
-              <td>{assistant.status}</td>
+              <td>{assistant.full_name}</td>
+              <td>{assistant.email}</td>
+              <td>{assistant.role}</td>
+              <td>{assistant.department}</td>
               <td>
-                <Button variant="warning" size="sm" className="me-2" onClick={() => handleEditAssistant(index)}>
+                <Button
+                  variant="warning"
+                  size="sm"
+                  className="me-2"
+                  onClick={() => {
+                    setEditAssistant(assistant);
+                    setShowForm(true);
+                  }}
+                >
                   <PencilSquare />
                 </Button>
-                <Button variant="danger" size="sm" onClick={() => handleDeleteAssistant(index)}>
+                <Button variant="danger" size="sm" onClick={() => handleDeleteAssistant(assistant.id)}>
                   <Trash />
                 </Button>
               </td>
@@ -75,7 +126,7 @@ const Assistants = () => {
         <Modal.Body>
           <AssistantsForm
             assistant={editAssistant}
-            onSave={editAssistant ? handleSaveAssistant : handleAddAssistant}
+            onSave={handleSaveAssistant}
             onCancel={() => setShowForm(false)}
           />
         </Modal.Body>

@@ -21,7 +21,7 @@ function Herosection() {
                                 <img src={grpimg} alt='goup img' />
                                 <p>Simply browse through our extensive list of trusted doctors,schedule your appointment hassle-free.</p>
                             </div>
-                            <a href='/home' className='rounded-pill'>
+                            <a href='/Register' className='rounded-pill'>
                                 Book appointment <span><FaArrowRightLong /></span>
                             </a>
                         </div>

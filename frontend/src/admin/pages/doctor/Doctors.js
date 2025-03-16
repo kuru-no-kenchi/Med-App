@@ -1,35 +1,76 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Container, Table, Button, Modal } from "react-bootstrap";
 import { PencilSquare, Trash } from "react-bootstrap-icons";
 import DoctorsForm from "./DoctorsForm";
+import { getdoctors, createDoctor, updateDoctor, deleteDoctor } from "./api_doctors";
 
 const Doctors = () => {
-  const [doctors, setDoctors] = useState([
-    { name: "Dr. Alice Johnson", specialty: "Cardiology", dateRegistered: "2025-03-01", status: "Pending" },
-    { name: "Dr. Bob Brown", specialty: "Neurology", dateRegistered: "2025-03-02", status: "Approved" },
-  ]);
+  const [doctors, setDoctors] = useState({});
   const [showForm, setShowForm] = useState(false);
   const [editDoctor, setEditDoctor] = useState(null);
 
-  const handleAddDoctor = (doctor) => {
-    setDoctors([...doctors, doctor]);
-    setShowForm(false);
+  useEffect(() => {
+    getAlldocs();
+  }, []); // Add empty dependency array
+
+  const getAlldocs = async () => {
+    try {
+      const response = await getdoctors();
+      const data = response.data;
+
+      // Log the API response
+      console.log("API Response:", data);
+
+      // Transform array into an object
+      const doctorsObject = data.reduce((acc, doctor) => {
+        acc[doctor.id] = doctor;
+        return acc;
+      }, {});
+
+      // Log the transformed object
+      console.log("Transformed Doctors Object:", doctorsObject);
+
+      setDoctors(doctorsObject);
+    } catch (error) {
+      console.error("Error fetching Doctors:", error);
+      setDoctors({});
+    }
   };
 
-  const handleEditDoctor = (index) => {
-    setEditDoctor({ ...doctors[index], index });
-    setShowForm(true);
+  const handleSaveDoctor = async (Doctor) => {
+    try {
+      if (editDoctor) {
+        await updateDoctor(editDoctor.id, Doctor);
+        setDoctors((prevDoctors) => ({
+          ...prevDoctors,
+          [editDoctor.id]: { ...prevDoctors[editDoctor.id], ...Doctor },
+        }));
+      } else {
+        const response = await createDoctor(Doctor);
+        const newDoctor = response.data;
+        setDoctors((prevDoctors) => ({
+          ...prevDoctors,
+          [newDoctor.id]: newDoctor,
+        }));
+      }
+      setShowForm(false);
+      setEditDoctor(null);
+    } catch (error) {
+      console.error("Error saving Doctor:", error);
+    }
   };
 
-  const handleDeleteDoctor = (index) => {
-    setDoctors(doctors.filter((_, i) => i !== index));
-  };
-
-  const handleSaveDoctor = (doctor) => {
-    const updatedDoctors = [...doctors];
-    updatedDoctors[doctor.index] = doctor;
-    setDoctors(updatedDoctors);
-    setShowForm(false);
+  const handleDeleteDoctor = async (id) => {
+    try {
+      await deleteDoctor(id);
+      setDoctors((prevDoctors) => {
+        const updatedDoctors = { ...prevDoctors };
+        delete updatedDoctors[id];
+        return updatedDoctors;
+      });
+    } catch (error) {
+      console.error("Error deleting Doctor:", error);
+    }
   };
 
   return (
@@ -42,24 +83,38 @@ const Doctors = () => {
             <th>#</th>
             <th>Name</th>
             <th>Specialty</th>
-            <th>Date Registered</th>
-            <th>Status</th>
+            <th>Experience</th>
+            <th>License Number</th>
+            <th>Hospital Name</th>
             <th>Action</th>
           </tr>
         </thead>
         <tbody>
-          {doctors.map((doctor, index) => (
-            <tr key={index}>
+          {Object.values(doctors).map((doctor, index) => (
+            <tr key={doctor.id}>
               <td>{index + 1}</td>
-              <td>{doctor.name}</td>
-              <td>{doctor.specialty}</td>
-              <td>{doctor.dateRegistered}</td>
-              <td>{doctor.status}</td>
+              <td>{doctor.full_name}</td>
+              <td>{doctor.specialization}</td>
+              <td>{doctor.experience}</td>
+              <td>{doctor.license_number}</td>
+              <td>{doctor.hosp_name}</td>
               <td>
-                <Button variant="warning" size="sm" className="me-2" onClick={() => handleEditDoctor(index)}>
+                <Button
+                  variant="warning"
+                  size="sm"
+                  className="me-2"
+                  onClick={() => {
+                    setEditDoctor(doctor);
+                    setShowForm(true);
+                  }}
+                >
                   <PencilSquare />
                 </Button>
-                <Button variant="danger" size="sm" onClick={() => handleDeleteDoctor(index)}>
+                <Button
+                  variant="danger"
+                  size="sm"
+                  onClick={() => handleDeleteDoctor(doctor.id)}
+                >
                   <Trash />
                 </Button>
               </td>
@@ -75,7 +130,7 @@ const Doctors = () => {
         <Modal.Body>
           <DoctorsForm
             doctor={editDoctor}
-            onSave={editDoctor ? handleSaveDoctor : handleAddDoctor}
+            onSave={handleSaveDoctor}
             onCancel={() => setShowForm(false)}
           />
         </Modal.Body>

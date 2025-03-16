@@ -38,7 +38,7 @@ const Sidebar = ({ collapsed, setCollapsed }) => {
 
   // Manage Sections
   const ManageSections = [
-    { name: "Users", icon: <People size={20} /> },
+    { name: "Users", icon: <People size={20} />, },
     { name: "Doctors", icon: <People size={20} /> },
     { name: "Patients", icon: <People size={20} /> },
     { name: "Assistants", icon: <People size={20} /> },

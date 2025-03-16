@@ -6,6 +6,7 @@ const UsersForm = ({ user, onSave, onCancel }) => {
     fullName: "",
     email: "",
     dateRegistered: new Date().toISOString().split("T")[0],
+    role:"Patient",
     status: "Pending",
   });
 
@@ -59,6 +60,21 @@ const UsersForm = ({ user, onSave, onCancel }) => {
           onChange={handleChange}
           required
         />
+      </Form.Group>
+      <Form.Group className="mb-3">
+        <Form.Label>Status</Form.Label>
+        <Form.Control
+          as="select"
+          name="role"
+          value={formData.status}
+          onChange={handleChange}
+          required
+        >
+          <option value="Admin">Admin</option>
+          <option value="Doctor">Doctor</option>
+          <option value="Patient">Patient</option>
+          <option value="Assistant">Assistant</option>
+        </Form.Control>
       </Form.Group>
       <Form.Group className="mb-3">
         <Form.Label>Status</Form.Label>

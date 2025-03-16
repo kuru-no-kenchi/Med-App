@@ -1,65 +1,116 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Container, Table, Button, Modal } from "react-bootstrap";
 import { PencilSquare, Trash } from "react-bootstrap-icons";
 import PatientsForm from "./PatientsForm";
-import { patients as initialPatients } from "../../Data";
+import { getPatients, createPatient, updatePatient, deletePatient } from "./api_patients";
 
 const Patients = () => {
-  const [patients, setPatients] = useState(initialPatients);
+  const [patients, setPatients] = useState({}); // Store patients as an object
   const [showForm, setShowForm] = useState(false);
   const [editPatient, setEditPatient] = useState(null);
 
-  const handleAddPatient = (patient) => {
-    setPatients([...patients, patient]);
-    setShowForm(false);
+  // Fetch all patients on component mount
+  useEffect(() => {
+    getAllPatients();
+  }, []);
+
+  // Fetch patients from the backend
+  const getAllPatients = async () => {
+    try {
+      const response = await getPatients();
+      const data = response.data;
+
+      // Transform array into an object
+      const patientsObject = data.reduce((acc, patient) => {
+        acc[patient.id] = patient; // Use patient.id as the key
+        return acc;
+      }, {});
+
+      setPatients(patientsObject);
+    } catch (error) {
+      console.error("Error fetching patients:", error);
+      setPatients({});
+    }
   };
 
-  const handleEditPatient = (index) => {
-    setEditPatient({ ...patients[index], index });
-    setShowForm(true);
+  // Handle saving a patient (create or update)
+  const handleSavePatient = async (patientData) => {
+    try {
+      if (editPatient) {
+        // Update existing patient
+        await updatePatient(editPatient.id, patientData);
+        setPatients((prevPatients) => ({
+          ...prevPatients,
+          [editPatient.id]: { ...prevPatients[editPatient.id], ...patientData },
+        }));
+      } else {
+        // Create new patient
+        const response = await createPatient(patientData);
+        const newPatient = response.data;
+        setPatients((prevPatients) => ({
+          ...prevPatients,
+          [newPatient.id]: newPatient,
+        }));
+      }
+      setShowForm(false);
+      setEditPatient(null);
+    } catch (error) {
+      console.error("Error saving patient:", error);
+    }
   };
 
-  const handleDeletePatient = (index) => {
-    setPatients(patients.filter((_, i) => i !== index));
-  };
-
-  const handleSavePatient = (patient) => {
-    const updatedPatients = [...patients];
-    updatedPatients[patient.index] = patient;
-    setPatients(updatedPatients);
-    setShowForm(false);
+  // Handle deleting a patient
+  const handleDeletePatient = async (id) => {
+    try {
+      await deletePatient(id);
+      setPatients((prevPatients) => {
+        const updatedPatients = { ...prevPatients };
+        delete updatedPatients[id]; // Remove the patient with the given ID
+        return updatedPatients;
+      });
+    } catch (error) {
+      console.error("Error deleting patient:", error);
+    }
   };
 
   return (
     <Container>
       <h2 className="my-3">Patients</h2>
-      <Button className="mb-3" onClick={() => setShowForm(true)}>Add Patient</Button>
+      <Button className="mb-3" onClick={() => { setEditPatient(null); setShowForm(true); }}>
+        Add Patient
+      </Button>
       <Table striped bordered hover>
         <thead>
           <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Disease</th>
-            <th>Doctor</th>
-            <th>Date Registered</th>
-            <th>Status</th>
+            <th>#</th>
+            <th>Full Name</th>
+            <th>Email</th>
+            <th>Date of Birth</th>
+            <th>Medical History</th>
             <th>Action</th>
           </tr>
         </thead>
         <tbody>
-          {patients.map((patient, index) => (
-            <tr key={index}>
-              <td>{patient.id}</td>
-              <td>{patient.name}</td>
-              <td>{patient.disease}</td>
-              <td>{patient.doctor}</td>
-              <td>{patient.dateRegistered}</td>
-              <td>{patient.status}</td>
+          {Object.values(patients).map((patient, index) => (
+            <tr key={patient.id}>
+              <td>{index + 1}</td>
+              <td>{patient.full_name}</td>
+              <td>{patient.email}</td>
+              <td>{patient.date_of_birth}</td>
+              <td>{patient.medical_history}</td>
               <td>
-                <Button variant="warning" size="sm" className="me-2" onClick={() => handleEditPatient(index)}>
+                <Button
+                  variant="warning"
+                  size="sm"
+                  className="me-2"
+                  onClick={() => {
+                    setEditPatient(patient);
+                    setShowForm(true);
+                  }}
+                >
                   <PencilSquare />
                 </Button>
-                <Button variant="danger" size="sm" onClick={() => handleDeletePatient(index)}>
+                <Button variant="danger" size="sm" onClick={() => handleDeletePatient(patient.id)}>
                   <Trash />
                 </Button>
               </td>
@@ -75,7 +126,7 @@ const Patients = () => {
         <Modal.Body>
           <PatientsForm
             patient={editPatient}
-            onSave={editPatient ? handleSavePatient : handleAddPatient}
+            onSave={handleSavePatient}
             onCancel={() => setShowForm(false)}
           />
         </Modal.Body>

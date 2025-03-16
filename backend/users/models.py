@@ -102,6 +102,13 @@ class Appointment(models.Model):
     app_time = models.TimeField(default=now)
     app_aprv = models.BooleanField(default=False)
     app_done = models.BooleanField(default=False)
+    @property
+    def doctor_name(self):
+        return self.app_doctor.user.first_name + ' ' + self.app_doctor.user.last_name
+
+    @property
+    def patient_name(self):
+        return self.app_patient.user.first_name + ' ' + self.app_patient.user.last_name
 
     def __str__(self):
         """Returns a string representation of the appointment."""
