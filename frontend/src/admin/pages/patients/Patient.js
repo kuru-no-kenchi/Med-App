@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Container, Table, Button, Modal } from "react-bootstrap";
 import { PencilSquare, Trash } from "react-bootstrap-icons";
-import PatientsForm from "./PatientsForm";
-import { getPatients, createPatient, updatePatient, deletePatient } from "./api_patients";
+import PatientsForm from "./PatientForm";
+import { getpatients, createpatient, updatepatient, deletepatient } from "./api_patients";
 
 const Patients = () => {
   const [patients, setPatients] = useState({}); // Store patients as an object
@@ -17,7 +17,7 @@ const Patients = () => {
   // Fetch patients from the backend
   const getAllPatients = async () => {
     try {
-      const response = await getPatients();
+      const response = await getpatients();
       const data = response.data;
 
       // Transform array into an object
@@ -38,14 +38,14 @@ const Patients = () => {
     try {
       if (editPatient) {
         // Update existing patient
-        await updatePatient(editPatient.id, patientData);
+        await updatepatient(editPatient.id, patientData);
         setPatients((prevPatients) => ({
           ...prevPatients,
           [editPatient.id]: { ...prevPatients[editPatient.id], ...patientData },
         }));
       } else {
         // Create new patient
-        const response = await createPatient(patientData);
+        const response = await createpatient(patientData);
         const newPatient = response.data;
         setPatients((prevPatients) => ({
           ...prevPatients,
@@ -60,9 +60,9 @@ const Patients = () => {
   };
 
   // Handle deleting a patient
-  const handleDeletePatient = async (id) => {
+  const handleDeletepatient = async (id) => {
     try {
-      await deletePatient(id);
+      await deletepatient(id);
       setPatients((prevPatients) => {
         const updatedPatients = { ...prevPatients };
         delete updatedPatients[id]; // Remove the patient with the given ID
@@ -86,6 +86,7 @@ const Patients = () => {
             <th>Full Name</th>
             <th>Email</th>
             <th>Date of Birth</th>
+            <th>Insurance Number</th>
             <th>Medical History</th>
             <th>Action</th>
           </tr>
@@ -97,6 +98,7 @@ const Patients = () => {
               <td>{patient.full_name}</td>
               <td>{patient.email}</td>
               <td>{patient.date_of_birth}</td>
+              <td>{patient.insurance_number}</td>
               <td>{patient.medical_history}</td>
               <td>
                 <Button
@@ -110,7 +112,7 @@ const Patients = () => {
                 >
                   <PencilSquare />
                 </Button>
-                <Button variant="danger" size="sm" onClick={() => handleDeletePatient(patient.id)}>
+                <Button variant="danger" size="sm" onClick={() => handleDeletepatient(patient.id)}>
                   <Trash />
                 </Button>
               </td>

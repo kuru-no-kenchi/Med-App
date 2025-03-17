@@ -25,10 +25,12 @@ import Settings from './admin/pages/Settings.js';
 import TodaysPreference from './admin/pages/TodaysPreference.js';
 import MyDoctor from './admin/pages/DoctorChat.js';
 import Profile from "./admin/pages/Profile.js";
-
+import Patients from "./admin/pages/patients/Patient.js";
+import PatientsForm from "./admin/pages/patients/PatientForm.js";
 import Login from "./admin/pages/Login.js";
 import Register from "./admin/pages/Register.js";
-
+import Assistants from './admin/pages/assistants/Assistants.js';
+import AssistantsForm from './admin/pages/assistants/AssistantsForm.js';
 // Import App Context
 import AppContextProvider from './Context/AppContext.js';
 
@@ -60,8 +62,20 @@ function App() {
 
               <Route path="doctors/list" element={<Doctors />} />
               <Route path="doctors/add" element={<DoctorsForm />} />
+              <Route path="doctors/edit/:id" element={<DoctorsForm />} />
+              {/** <Route path="doctors/delete/:id" element={<DeletePage />} />*/}
+              <Route path="patients/list" element={<Patients />} />
+              <Route path="patients/add" element={<PatientsForm />} />
+              <Route path="patients/edit/:id" element={<PatientsForm />} />
+              {/*}<Route path="patientss/delete/:id" element={<DeletePage />} />*/}
+              <Route path="assistants/list" element={<Assistants />} />
+              <Route path="assistants/add" element={<AssistantsForm />} />
+              <Route path="assistants/edit/:id" element={<AssistantsForm />} />
+              {/*}<Route path="assistants/delete/:id" element={<DeletePage />} /> */}
               <Route path="appointments/list" element={<Appointments />} />
               <Route path="appointments/add" element={<AppointmentsForm />} />
+              <Route path="appointments/edit/:id" element={<AppointmentsForm />} />
+              {/*}<Route path="appointments/delete/:id" element={<DeletePage />} /> */} 
               <Route path="messages" element={<Messages />} />
               <Route path="settings" element={<Settings />} />
               <Route path="todays-preference" element={<TodaysPreference />} />

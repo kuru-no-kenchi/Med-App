@@ -7,32 +7,68 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const login = async (email, password) => {
     try {
-      const response = await axios.post("http://127.0.0.1:8000/auth/login/", {
+      const response = await axios.post("http://localhost:8000/api/token/", {
         email,
         password,
       });
 
-      // Store the authentication token in localStorage
-      localStorage.setItem("authToken", response.data.key);
-      alert("Login successful!");
-
-      // Redirect to another page after login (e.g., dashboard)
-      window.location.href = "/dashboard";
-    } catch (err) {
+      const { access, refresh } = response.data;
+      
+      localStorage.setItem("access_token", access);
+      localStorage.setItem("refresh_token", refresh);
+      
+      axios.defaults.headers.common["Authorization"] = `Bearer ${access}`;
+      
+      console.log("Login successful!");
+    } catch (error) {
       setError("Invalid email or password");
-    } // this is the API call
+      console.error("Login failed", error);
+    }
   };
-
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    await login(email, password);
+  };
+  const refreshToken = async () => {
+    try {
+      const refresh = localStorage.getItem("refresh_token");
+  
+      if (!refresh) return;
+  
+      const response = await axios.post("http://localhost:8000/api/token/refresh/", {
+        refresh: refresh,
+      });
+      const { access } = response.data;
+      localStorage.setItem("access_token", access);
+      axios.defaults.headers.common["Authorization"] = `Bearer ${access}`;
+    } catch (error) {
+      console.error("Token refresh failed", error);
+    }
+  };
+  // Refresh token before it expires
+  setInterval(refreshToken, 1000 * 60 * 14); // Refresh every 14 minutes
+  const getProfile = async () => {
+    try {
+      const response = await axios.get("http://localhost:8000/api/profile/", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+        },
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Profile fetch failed", error);
+    }
+  };
   return (
     <Container className="d-flex justify-content-center align-items-center vh-100">
       <Card className="shadow-lg p-4 border-0" style={{ width: "400px" }}>
         <Card.Body>
           <h2 className="text-center mb-4">Login</h2>
+          {error && <p className="text-danger text-center">{error}</p>}
           <Form onSubmit={handleSubmit}>
-                      <Form.Group className="mb-3">
+            <Form.Group className="mb-3">
               <Form.Label>Email address</Form.Label>
               <Form.Control
                 type="email"
@@ -63,5 +99,4 @@ const Login = () => {
     </Container>
   );
 };
-
 export default Login;

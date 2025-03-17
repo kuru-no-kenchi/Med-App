@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Container, Table, Button, Modal } from "react-bootstrap";
 import { PencilSquare, Trash } from "react-bootstrap-icons";
 import AssistantsForm from "./AssistantsForm";
-import { getAssistants, createAssistant, updateAssistant, deleteAssistant } from "./api_assistants";
+import { getAssistants, createAssistant, updateAssistant, deleteAssistant } from "./api_assistant";
 
 const Assistants = () => {
   const [assistants, setAssistants] = useState({}); // Store assistants as an object
@@ -85,8 +85,8 @@ const Assistants = () => {
             <th>#</th>
             <th>Full Name</th>
             <th>Email</th>
-            <th>Role</th>
-            <th>Department</th>
+            <th>Experience</th>
+            <th>Hospital Name</th>
             <th>Action</th>
           </tr>
         </thead>
@@ -96,8 +96,8 @@ const Assistants = () => {
               <td>{index + 1}</td>
               <td>{assistant.full_name}</td>
               <td>{assistant.email}</td>
-              <td>{assistant.role}</td>
-              <td>{assistant.department}</td>
+              <td>{assistant.experience}</td>
+              <td>{assistant.hosp_name}</td>
               <td>
                 <Button
                   variant="warning"

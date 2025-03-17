@@ -1,11 +1,37 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
+from rest_framework.permissions import IsAuthenticated
 from rest_framework import status, permissions
 from .models import CustomUser,Doctor, Patient, Assistant, Appointment
 from .serializers import *
 
+@method_decorator(csrf_exempt, name='dispatch')
+class AdminCreateView(APIView):
+    permission_classes = [IsAuthenticated]
+    def post(self, request, model_type):
+        """
+        Create a new object (User, Doctor, Patient, Assistant, or Appointment)
+        """
+        serializers_map = {
+            "user": CustomUserSerializer,
+            "doctor": DoctorSerializer,
+            "patient": PatientSerializer,
+            "assistant": AssistantSerializer,
+            "appointment": AppointmentSerializer
+        }
 
+        if model_type not in serializers_map:
+            return Response({"error": "Invalid model type"}, status=status.HTTP_400_BAD_REQUEST)
 
+        serializer_class = serializers_map[model_type]
+        serializer = serializer_class(data=request.data)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 # USER MANAGEMENT
 class UserListCreateView(APIView):
     permission_classes = []
@@ -66,12 +92,7 @@ class DoctorListCreateView(APIView):
         serializer = DoctorSerializer(doctors, many=True)
         return Response(serializer.data)
 
-    def post(self, request):
-        serializer = DoctorSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 
 class DoctorDetailView(APIView):

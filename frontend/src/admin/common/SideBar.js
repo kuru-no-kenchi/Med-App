@@ -25,8 +25,7 @@ const Sidebar = ({ collapsed, setCollapsed }) => {
   const Sections = [
     { name: "Home", icon: <House size={20} />, link: "/admin" },
     { name: "Profile", icon: <Person size={20} />, link: "/admin/profile" },
-    { name: "My Doctor", icon: <ChatDots size={20} />, link: "/admin/my-doctor" },
-    { name: "AI Analysis", icon: <Robot size={20} />, link: "/admin/ai-analysis" }
+   
   ];
 
   // Additional Sections (Settings, Messages, Logout)
@@ -39,6 +38,8 @@ const Sidebar = ({ collapsed, setCollapsed }) => {
   // Manage Sections
   const ManageSections = [
     { name: "Users", icon: <People size={20} />, },
+    { name: "My Doctor", icon: <ChatDots size={20} />, link: "/admin/my-doctor" },
+    { name: "AI Analysis", icon: <Robot size={20} />, link: "/admin/ai-analysis" },
     { name: "Doctors", icon: <People size={20} /> },
     { name: "Patients", icon: <People size={20} /> },
     { name: "Assistants", icon: <People size={20} /> },

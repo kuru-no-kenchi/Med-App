@@ -77,51 +77,47 @@ const Doctors = () => {
     <Container>
       <h2 className="my-3">Doctors</h2>
       <Button className="mb-3" onClick={() => setShowForm(true)}>Add Doctor</Button>
-      <Table striped bordered hover>
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Name</th>
-            <th>Specialty</th>
-            <th>Experience</th>
-            <th>License Number</th>
-            <th>Hospital Name</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          {Object.values(doctors).map((doctor, index) => (
-            <tr key={doctor.id}>
-              <td>{index + 1}</td>
-              <td>{doctor.full_name}</td>
-              <td>{doctor.specialization}</td>
-              <td>{doctor.experience}</td>
-              <td>{doctor.license_number}</td>
-              <td>{doctor.hosp_name}</td>
-              <td>
-                <Button
-                  variant="warning"
-                  size="sm"
-                  className="me-2"
-                  onClick={() => {
-                    setEditDoctor(doctor);
-                    setShowForm(true);
-                  }}
-                >
-                  <PencilSquare />
-                </Button>
-                <Button
-                  variant="danger"
-                  size="sm"
-                  onClick={() => handleDeleteDoctor(doctor.id)}
-                >
-                  <Trash />
-                </Button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </Table>
+            <Table striped bordered hover>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Full Name</th>
+                  <th>Email</th>
+                  <th>Experience</th>
+                  <th>Hospital Name</th>
+                  <th>Speciality</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {Object.values(doctors).map((doctor, index) => (
+                  <tr key={doctor.id}>
+                    <td>{index + 1}</td>
+                    <td>{doctor.full_name}</td>
+                    <td>{doctor.email}</td>
+                    <td>{doctor.doc_experience}</td>
+                    <td>{doctor.hosp_name}</td>
+                    <td>{doctor.doc_specialization}</td>
+                    <td>
+                      <Button
+                        variant="warning"
+                        size="sm"
+                        className="me-2"
+                        onClick={() => {
+                          setEditDoctor(doctor);
+                          setShowForm(true);
+                        }}
+                      >
+                        <PencilSquare />
+                      </Button>
+                      <Button variant="danger" size="sm" onClick={() => handleDeleteDoctor(doctor.id)}>
+                        <Trash />
+                      </Button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </Table>
 
       <Modal show={showForm} onHide={() => setShowForm(false)}>
         <Modal.Header closeButton>
