@@ -3,17 +3,23 @@ import { Form, Button } from "react-bootstrap";
 
 const PatientsForm = ({ patient, onSave, onCancel }) => {
   const [formData, setFormData] = useState({
-    id: "",
-    name: "",
-    disease: "",
-    doctor: "",
-    dateRegistered: new Date().toISOString().split("T")[0],
-    status: "Pending",
+    patient_id:"",
+    full_name: "",      
+    pat_email: "",
+    date_of_birth: "",   
+    insurance_number: "", 
+    medical_history: "",  
   });
-
   useEffect(() => {
     if (patient) {
-      setFormData(patient);
+      setFormData({
+        patient_id:patient.patient_id,
+        full_name: patient.full_name || "",
+        pat_email: patient.email || "",
+        date_of_birth: patient.date_of_birth?.split("T")[0] || "",
+        insurance_number: patient.insurance_number || "",
+        medical_history: patient.medical_history || "",
+      });
     }
   }, [patient]);
 
@@ -33,68 +39,64 @@ const PatientsForm = ({ patient, onSave, onCancel }) => {
   return (
     <Form onSubmit={handleSubmit}>
       <Form.Group className="mb-3">
-        <Form.Label>ID</Form.Label>
+      <Form.Label>ID</Form.Label>
         <Form.Control
           type="text"
-          name="id"
-          value={formData.id}
+          name="patient_id"       
+          value={formData.patient_id}
           onChange={handleChange}
           required
         />
       </Form.Group>
       <Form.Group className="mb-3">
-        <Form.Label>Name</Form.Label>
+        <Form.Label>Full Name</Form.Label>
         <Form.Control
           type="text"
-          name="name"
-          value={formData.name}
+          name="full_name"       
+          value={formData.full_name}
           onChange={handleChange}
           required
         />
       </Form.Group>
       <Form.Group className="mb-3">
-        <Form.Label>Disease</Form.Label>
+        <Form.Label>Email</Form.Label>
         <Form.Control
-          type="text"
-          name="disease"
-          value={formData.disease}
+          type="email"      
+          name="pat_email"
+          value={formData.pat_email}
           onChange={handleChange}
           required
         />
       </Form.Group>
       <Form.Group className="mb-3">
-        <Form.Label>Doctor</Form.Label>
-        <Form.Control
-          type="text"
-          name="doctor"
-          value={formData.doctor}
-          onChange={handleChange}
-          required
-        />
-      </Form.Group>
-      <Form.Group className="mb-3">
-        <Form.Label>Date Registered</Form.Label>
+        <Form.Label>Date of Birth</Form.Label>
         <Form.Control
           type="date"
-          name="dateRegistered"
-          value={formData.dateRegistered}
+          name="date_of_birth"   
+          value={formData.date_of_birth}
           onChange={handleChange}
           required
         />
       </Form.Group>
       <Form.Group className="mb-3">
-        <Form.Label>Status</Form.Label>
+        <Form.Label>Insurance Number</Form.Label>
         <Form.Control
-          as="select"
-          name="status"
-          value={formData.status}
+          type="text"
+          name="insurance_number" 
+          value={formData.insurance_number}
           onChange={handleChange}
           required
-        >
-          <option value="Pending">Pending</option>
-          <option value="Approved">Approved</option>
-          <option value="Rejected">Rejected</option>
-        </Form.Control>
+        />
+      </Form.Group>
+      <Form.Group className="mb-3">
+        <Form.Label>Medical History</Form.Label>
+        <Form.Control
+          as="textarea"          
+          name="medical_history" 
+          value={formData.medical_history}
+          onChange={handleChange}
+          required
+        />
       </Form.Group>
       <Button variant="primary" type="submit" className="me-2">
         Save

@@ -1,7 +1,7 @@
 from django.db import models
-from django.utils import timezone
-from django.utils.timezone import now
-from django.contrib.auth.models import AbstractUser, BaseUserManager
+from django.utils import timezone # type: ignore
+from django.utils.timezone import now # type: ignore
+from django.contrib.auth.models import AbstractUser, BaseUserManager # type: ignore
 
 class Users_Manager(BaseUserManager):
     """Custom user manager for handling user creation."""
@@ -34,6 +34,7 @@ class CustomUser(AbstractUser):
     role = models.CharField(max_length=10, default='patient', choices=ROLE_CHOICES)
     email = models.EmailField(max_length=100, unique=True)
     username = models.CharField(max_length=40, null=True, blank=True)
+    image = models.ImageField(upload_to="images",null=True, blank=True)
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
 
@@ -62,8 +63,8 @@ class Doctor(models.Model):
     specialization = models.CharField(max_length=255)
     license_number = models.CharField(max_length=50, unique=True)
     hospital_name = models.CharField(max_length=255)
-    certificate = models.FileField(upload_to='doctors/certificates/')
-    experience = models.IntegerField(default=0)
+    certificate = models.FileField(upload_to='doctors/certificates/',blank=True,null=True)
+    experience = models.IntegerField(default=0,blank=True,null=True)
 
     def __str__(self):
         """Returns a string representation of the doctor."""
@@ -71,7 +72,6 @@ class Doctor(models.Model):
 
 class Patient(models.Model):
     """Model representing a patient with medical history."""
-    
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, primary_key=True)
     medical_history = models.TextField(blank=True, null=True)
     date_of_birth = models.DateField(null=True, blank=True, default="2000-01-01")
@@ -83,12 +83,10 @@ class Patient(models.Model):
 
 class Assistant(models.Model):
     """Model representing a medical assistant."""
-    
-    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, primary_key=True)
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, primary_key=True,)
     hospital_name = models.CharField(max_length=255)
-    experience = models.IntegerField(default=0)
-    certificate = models.FileField(upload_to='assistants/certificates/')
-
+    experience = models.IntegerField(default=0, null=True,blank=True)
+    certificate = models.FileField(upload_to='assistants/certificates/',blank=True,null=True)
     def __str__(self):
         """Returns a string representation of the assistant."""
         return f"{self.user.first_name} {self.user.last_name}"

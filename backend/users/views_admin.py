@@ -1,37 +1,11 @@
 from rest_framework.views import APIView
+import json
 from rest_framework.response import Response
-from django.utils.decorators import method_decorator
-from django.views.decorators.csrf import csrf_exempt
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status, permissions
 from .models import CustomUser,Doctor, Patient, Assistant, Appointment
 from .serializers import *
 
-@method_decorator(csrf_exempt, name='dispatch')
-class AdminCreateView(APIView):
-    permission_classes = [IsAuthenticated]
-    def post(self, request, model_type):
-        """
-        Create a new object (User, Doctor, Patient, Assistant, or Appointment)
-        """
-        serializers_map = {
-            "user": CustomUserSerializer,
-            "doctor": DoctorSerializer,
-            "patient": PatientSerializer,
-            "assistant": AssistantSerializer,
-            "appointment": AppointmentSerializer
-        }
-
-        if model_type not in serializers_map:
-            return Response({"error": "Invalid model type"}, status=status.HTTP_400_BAD_REQUEST)
-
-        serializer_class = serializers_map[model_type]
-        serializer = serializer_class(data=request.data)
-
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 # USER MANAGEMENT
 class UserListCreateView(APIView):
     permission_classes = []
@@ -43,11 +17,21 @@ class UserListCreateView(APIView):
         return Response(serializer.data)
 
     def post(self, request):
-        serializer = CustomUserSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        try:
+        # Log the incoming data
+            print("Received data:", json.loads(request.body))  # For debugging
+
+        # If using Django serializers
+            serializer = CustomUserSerializer(data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=201)
+            else:
+                print("Validation errors:", serializer.errors)  # Debugging
+                return Response(serializer.errors, status=400)
+        except Exception as e:
+            print("Error:", e)  # Log the exception
+            return Response({"error": str(e)}, status=400)
 
 
 class UserDetailView(APIView):
@@ -67,9 +51,11 @@ class UserDetailView(APIView):
         return Response(serializer.data)
 
     def put(self, request, pk):
-        user = self.get_object(pk)
-        if not user:
+        try:
+            user = CustomUser.objects.get(pk=pk)
+        except CustomUser.DoesNotExist:
             return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+    
         serializer = CustomUserSerializer(user, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
@@ -91,7 +77,12 @@ class DoctorListCreateView(APIView):
         doctors = Doctor.objects.all()
         serializer = DoctorSerializer(doctors, many=True)
         return Response(serializer.data)
-
+    def post(self,request):
+        serializer = DoctorSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 
@@ -121,12 +112,29 @@ class DoctorDetailView(APIView):
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def delete(self, request, pk):
-        doctor = self.get_object(pk)
-        if not doctor:
-            return Response({"error": "Doctor not found"}, status=status.HTTP_404_NOT_FOUND)
-        doctor.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+    def delete(self, request, pk, format=None):
+        try:
+            #khod the doctor instance
+            doctor = Doctor.objects.get(pk=pk)
+            user = doctor.user  # Get related user
+            # 7ayd the doctor record first
+            doctor.delete()
+            # moraha 7ayed the user account
+            user.delete()
+            return Response(
+                {"message": "Doctor and associated user deleted successfully"},
+                status=status.HTTP_204_NO_CONTENT
+            )
+        except Doctor.DoesNotExist:
+            return Response(
+                {"error": "Doctor not found"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        except Exception as e:
+            return Response(
+                {"error": str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
 
 # the same shit for Patients, Assistants, and Appointments...
@@ -173,12 +181,29 @@ class PatientDetailView(APIView):
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def delete(self, request, pk):
-        patient = self.get_object(pk)
-        if not patient:
-            return Response({"error": "patient not found"}, status=status.HTTP_404_NOT_FOUND)
-        patient.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+    def delete(self, request, pk, format=None):
+        try:
+            #khod the patient instance
+            patient = Patient.objects.get(pk=pk)
+            user = patient.user  # Get related user
+            # 7ayd the doctor record first
+            patient.delete()
+            # moraha 7ayed the user account
+            user.delete()
+            return Response(
+                {"message": "Patient and associated user deleted successfully"},
+                status=status.HTTP_204_NO_CONTENT
+            )
+        except Patient.DoesNotExist:
+            return Response(
+                {"error": "Patient not found"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        except Exception as e:
+            return Response(
+                {"error": str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
 # Assistant Manager
 
@@ -223,15 +248,33 @@ class AssistantDetailView(APIView):
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def delete(self, request, pk):
-        assistant = self.get_object(pk)
-        if not assistant:
-            return Response({"error": "Assistant not found"}, status=status.HTTP_404_NOT_FOUND)
-        assistant.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
+    def delete(self, request, pk, format=None):
+        try:
+            #khod the assisstant instance
+            assisstant = Assistant.objects.get(pk=pk)
+            user = assisstant.user  # Get related user
+            # 7ayd the assisstant record first
+            assisstant.delete()
+            # moraha 7ayed the user account
+            user.delete()
+            return Response(
+                {"message": "Assisstant and associated user deleted successfully"},
+                status=status.HTTP_204_NO_CONTENT
+            )
+        except Assistant.DoesNotExist:
+            return Response(
+                {"error": "Assisstant not found"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        except Exception as e:
+            return Response(
+                {"error": str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+            
+            
+            
 # Appointment Manager
-
 class AppointmentListCreateView(APIView):
     permission_classes = []
     authentication_classes = []
@@ -239,7 +282,6 @@ class AppointmentListCreateView(APIView):
         appointments = Appointment.objects.all()
         serializer = AppointmentSerializer(appointments, many=True)
         return Response(serializer.data)
-
 
     def post(self, request):
         serializer = AppointmentSerializer(data=request.data)

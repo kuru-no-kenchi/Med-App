@@ -6,7 +6,7 @@ const API_URL = "http://127.0.0.1:8000/";
 export const createAssistant = (assistantData) => axios.post(`${API_URL}assistants/`, assistantData);
 
 // Get all assistants
-export const getAssistants = () => axios.get(`${API_URL}assistants/list`);
+export const getAssistants = () => axios.get(`${API_URL}assistants/list/`);
 
 // Update a assistant
 export const updateAssistant = (id, assistantData) => axios.put(`${API_URL}assistants/${id}/`, assistantData);

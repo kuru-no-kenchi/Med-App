@@ -2,7 +2,8 @@ import React, { useEffect, useState } from "react";
 import { Container, Table, Button, Modal } from "react-bootstrap";
 import { PencilSquare, Trash } from "react-bootstrap-icons";
 import UsersForm from "./UsersForm";
-import { getUsers, createUser, updateUser, deleteUser } from "./api_users";
+import axios from "axios";
+import { createUser,updateUser, getUsers,deleteUser } from "./api_users";
 
 const Users = () => {
   const [users, setUsers] = useState({}); // Store users as an object
@@ -17,7 +18,6 @@ const Users = () => {
     try {
       const response = await getUsers();
       const data = response.data;
-
       // Transform array into an object
       const usersObject = data.reduce((acc, user) => {
         acc[user.id] = user;
@@ -30,29 +30,66 @@ const Users = () => {
       setUsers({});
     }
   };
-
-  const handleSaveUser = async (user) => {
+  const handleCreateUser = async (userData) => {
     try {
-      if (editUser) { 
-        await updateUser(editUser.id, user);
-        setUsers((prevUsers) => ({
-          ...prevUsers,
-          [editUser.id]: { ...prevUsers[editUser.id], ...user },
-        }));
-      } else {
-        const response = await createUser(user);
-        const newUser = response.data;
-        setUsers((prevUsers) => ({
-          ...prevUsers,
-          [newUser.id]: newUser,
-        }));
-      }
+      const formattedUserData = {
+        ...userData,
+        date_of_birth: userData.date_of_birth?.split("T")[0] || null,
+      };
+
+      await axios.post("http://127.0.0.1:8000/users/list/", formattedUserData, {
+        headers: { "Content-Type": "application/json" },
+      });
+
       setShowForm(false);
-      setEditUser(null);
+      handleAllUsers();
     } catch (error) {
-      console.error("Error saving user:", error);
+      console.error("Error creating user:", error.response?.data || error.message);
     }
   };
+      const handleUpdateUser = async (userData) => {
+        try {
+          await updateUser(editUser.user_id, userData);
+          setShowForm(false);
+          setEditUser(null);
+          handleAllUsers();
+        } catch (error) {
+          console.error("Error updating user:", error.response?.data || error.message);
+        }
+      };
+      const handleSaveUser = (userData) => {
+        if (editUser) {
+          handleUpdateUser(userData);
+        } else {
+          handleCreateUser(userData);
+        }
+      };
+  const saveUser = async (userData) => {
+    try {
+      // Convert date to "YYYY-MM-DD" format
+      const formattedUserData = {
+        ...userData,
+        role: userData.role ? userData.role.toLowerCase() : null,
+        date_joined: userData.date_joined ? userData.date_joined.split("T")[0] : null, 
+      };
+      const response = await axios.post("http://127.0.0.1:8000/users/list/", formattedUserData, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      setShowForm(false); 
+      return response.data;
+    } catch (error) {
+      if (error.response) {
+        console.error("Backend error:", error.response.data);
+      } else {
+        console.error("Request failed:", error.message);
+      }
+      throw error;
+    }
+  };
+  
+
   const handleDeleteUser = async (id) => {
     try {
       await deleteUser(id);
@@ -85,19 +122,18 @@ const Users = () => {
             <th>Full Name</th>
             <th>Email</th>
             <th>Date Registered</th>
-            <th>Status</th>
+            <th>Role</th>
             <th>Action</th>
           </tr>
         </thead>
         <tbody>
           {Object.values(users).map((user, index) => (
             <tr key={user.id}>
-              <td>{index + 1}</td>
+              <td>{user.id}</td>
               <td>{user.first_name+" "+user.last_name}</td>
               <td>{user.email}</td>
               <td>{formatDate(user.date_joined)}</td>
-              {/*<td>{user.role}</td> */}
-              <td>{user.status}</td>
+              <td>{user.role}</td>
               <td>
                 <Button
                   variant="warning"

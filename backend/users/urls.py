@@ -9,7 +9,6 @@ urlpatterns = [
     # admin Endpoints
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    path('admin/create/<str:model_type>/', AdminCreateView.as_view(), name='admin-create'),
     path('users/list/', UserListCreateView.as_view(), name='user-list'),
     path('users/<int:pk>/', UserDetailView.as_view(), name='user-detail'),
     path('doctors/list/', DoctorListCreateView.as_view(), name='doctor-list'),
