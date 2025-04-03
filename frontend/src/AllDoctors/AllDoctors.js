@@ -1,18 +1,15 @@
-import { useContext, useEffect, useState } from 'react';
-import './AllDoctors.css'
-import '../Home/TopDoctors.css'
-import { AppContext } from '../Context/AppContext';
+import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { AppContext } from '../Context/AppContext';
+import { Container, Row, Col, Card, Button } from 'react-bootstrap';
+import './AllDoctors.css';
+import '../Home/TopDoctors.css';
+
 function AllDoctors() {
-    // useParams for accesesing parameter
-    const { speciality } = useParams()
-    // create navigate const to navigate diffrent link
-    const navigate = useNavigate()
-    // create useState for storing doctors Data
-    const [filterDoc, setFilterDoc] = useState([])
-    // use context to get data from Data.js file
-    const { doctors } = useContext(AppContext)
-    // create function to filter doctors according function
+    const { speciality } = useParams(); // Accessing parameter
+    const navigate = useNavigate();
+    const [filterDoc, setFilterDoc] = useState([]);
+    const { doctors } = useContext(AppContext);
 
     useEffect(() => {
         const applyFilter = () => {
@@ -24,45 +21,57 @@ function AllDoctors() {
         };
 
         applyFilter();
-    }, [doctors, speciality]); // Only depend on doctors and speciality
-
-
+    }, [doctors, speciality]);
 
     return (
-        <section className="container-fluid" id="alldoctor-section">
-            <div className='container'>
-                <p>Browse through the doctors specialist.</p>
-                <div className='row'>
-                    <div class="col-12 col-md-3 col-lg-2 specialities">
-                        <p onClick={() => speciality === 'General physician' ? navigate('/doctors') : navigate('/doctors/General physician')}>General physician</p>
-                        <p onClick={() => speciality === 'Gynecologist' ? navigate('/doctors') : navigate('/doctors/Gynecologist')}>Gynecologist</p>
-                        <p onClick={() => speciality === 'Dermatologist' ? navigate('/doctors') : navigate('/doctors/Dermatologist')}>Dermatologist</p>
-                        <p onClick={() => speciality === 'Pediatricians' ? navigate('/doctors') : navigate('/doctors/Pediatricians')}>Pediatricians</p>
-                        <p onClick={() => speciality === 'Neurologist' ? navigate('/doctors') : navigate('/doctors/Neurologist')}>Neurologist</p>
-                        <p onClick={() => speciality === 'Gastroenterologist' ? navigate('/doctors') : navigate('/doctors/Gastroenterologist')}>Gastroenterologist</p>
-                    </div>
-                    <div className='col-12 col-md-9 col-lg-10 all-doctors'>
-                        {
-                            filterDoc.map((item, index) => {
+        <section id="alldoctor-section" className="py-5">
+            <Container>
+                <p className="text-center mb-4">Browse through our trusted doctors' specialities.</p>
+                <Row>
+                    {/* Specialities List */}
+                    <Col md={3} lg={2} className="mb-4">
+                        <h5 className="fw-bold mb-3">Specialities</h5>
+                        <ul className="list-unstyled">
+                            {['General physician', 'Gynecologist', 'Dermatologist', 'Pediatricians', 'Neurologist', 'Gastroenterologist'].map((specialityItem) => (
+                                <li key={specialityItem}>
+                                    <Button
+                                        variant="link"
+                                        className={speciality === specialityItem ? 'text-primary' : 'text-dark'}
+                                        onClick={() => speciality === specialityItem ? navigate('/doctors') : navigate(`/doctors/${specialityItem}`)}
+                                    >
+                                        {specialityItem}
+                                    </Button>
+                                </li>
+                            ))}
+                        </ul>
+                    </Col>
 
-                                return (
-                                    <div key={index} className="col-12 col-md-5 col-lg-3" id="doctor-card">
-                                        <img src={item.image} alt="docimg" className="img-fluid" />
-                                        <div className="doctor-info">
-                                            <div className="available">
-                                                <p></p><p>Available</p>
+                    {/* Doctors List */}
+                    <Col md={9} lg={10}>
+                        <Row>
+                            {filterDoc.map((item, index) => (
+                                <Col key={index} xs={12} md={6} lg={4} className="mb-4">
+                                    <Card className="doctor-card">
+                                        <Card.Img variant="top" src={item.image} alt="Doctor" className="img-fluid" />
+                                        <Card.Body>
+                                            <div className="d-flex justify-content-between align-items-center mb-2">
+                                                <span className="badge bg-success text-white">Available</span>
                                             </div>
-                                            <p className="doctor-name">{item.name}</p>
-                                            <p className="doctor-speciality">{item.speciality}</p>
-                                        </div>
-                                    </div>
-                                );
-                            })
-                        }
-                    </div>
-                </div>
-            </div>
+                                            <Card.Title>{item.name}</Card.Title>
+                                            <Card.Text className="text-muted">{item.speciality}</Card.Text>
+                                            <Button variant="outline-primary" className="w-100">
+                                                Book Appointment
+                                            </Button>
+                                        </Card.Body>
+                                    </Card>
+                                </Col>
+                            ))}
+                        </Row>
+                    </Col>
+                </Row>
+            </Container>
         </section>
     );
 }
+
 export default AllDoctors;

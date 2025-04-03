@@ -8,6 +8,7 @@ import Home from './Home/Home.js';
 import About from './About/About.js';
 import AllDoctors from './AllDoctors/AllDoctors.js';
 import Contact from './Contact/Contact.js';
+import DoctorProfile from './DoctorProfile/DoctorProfile.js';
 
 // Import Admin Components
 import AdminLayout from './admin/AdminLayout.js';
@@ -48,6 +49,7 @@ function App() {
             <Route path="/About" element={<About />} />
             <Route path="/AllDoctors" element={<AllDoctors />} />
             <Route path="/doctors" element={<AllDoctors />} />
+            <Route path="/doctor/:id" element={<DoctorProfile />} />
             <Route path="/doctors/:speciality" element={<AllDoctors />} />
             <Route path="/Contact" element={<Contact />} />
             <Route path="/login" element={<Login />} />
