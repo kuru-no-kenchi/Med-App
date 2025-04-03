@@ -5,7 +5,13 @@ import AppointmentsForm from "./AppointmentsForm";
 import { getAppointments, createAppointments, updateAppointments, deleteAppointments } from "./api_appointments";
 
 const Appointments = () => {
-  const [appointments, setAppointments] = useState({});
+  const defaultAppointments = {
+    1: { id: 1, doctor_name: "Dr. Amine Zahi", patient_name: "John Doe", app_date: "2025-04-10", app_time: "10:00 AM", app_aprv: true, app_done: false },
+    2: { id: 2, doctor_name: "Dr. Sohaile Ziane", patient_name: "Jane Smith", app_date: "2025-04-12", app_time: "02:30 PM", app_aprv: true, app_done: true },
+    3: { id: 3, doctor_name: "Dr. Mohamed Ridouani", patient_name: "Alice Brown", app_date: "2025-04-15", app_time: "09:15 AM", app_aprv: false, app_done: false },
+    4: { id: 4, doctor_name: "Dr. Hossam Louazna", patient_name: "Robert Wilson", app_date: "2025-04-18", app_time: "03:45 PM", app_aprv: true, app_done: false },
+  };
+  const [appointments, setAppointments] = useState(defaultAppointments);
   const [showForm, setShowForm] = useState(false);
   const [editAppointment, setEditAppointment] = useState(null);
 

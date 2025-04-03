@@ -1,6 +1,6 @@
 import React from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
-import logoimg from '../assets/images/logo-hospital.png';
+import logoimg from '../assets/logo.png';
 import './Footer.css';
 
 function Footer() {

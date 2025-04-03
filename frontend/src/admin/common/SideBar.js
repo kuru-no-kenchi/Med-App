@@ -39,13 +39,14 @@ const Sidebar = ({ collapsed, setCollapsed }) => {
   const ManageSections = [
     { name: "Users", icon: <People size={20} />, },
     { name: "My Doctor", icon: <ChatDots size={20} />, link: "/admin/my-doctor" },
-    { name: "AI Analysis", icon: <Robot size={20} />, link: "/admin/ai-analysis" },
+    { name: "AI Analysis", icon: <Robot size={20} />, link: "/admin/aianalysis" },
     { name: "Doctors", icon: <People size={20} /> },
     { name: "Patients", icon: <People size={20} /> },
     { name: "Assistants", icon: <People size={20} /> },
     { name: "Appointments", icon: <Calendar size={20} />, link: "/admin/appointments" },
-    { name: "Today's Preference", icon: <Calendar size={20} />, link: "/admin/todays-preference" }
+    { name: "Today's Preference", icon: <Calendar size={20} />, link: "/admin/todayspreference" }
   ];
+
 
   return (
     <Container fluid className="d-flex w-25 flex-direction-column">
@@ -99,13 +100,13 @@ const Sidebar = ({ collapsed, setCollapsed }) => {
                   {!collapsed && <span>{section.name}</span>}
                 </Accordion.Header>
                 <Accordion.Body className="ps-4">
-                  <div className="sidebar-item p-2 d-flex align-items-center">
+                  <div className=" p-2 d-flex align-items-center">
                     <List size={18} className="me-2" />
                     <Link to={`/admin/${section.name.toLowerCase()}/list`} className="text-decoration-none text-dark">
                       List
                     </Link>
                   </div>
-                  <div className="sidebar-item p-2 d-flex align-items-center">
+                  <div className=" p-2 d-flex align-items-center">
                     <Plus size={18} className="me-2" />
                     <Link to={`/admin/${section.name.toLowerCase()}/add`} className="text-decoration-none text-dark">
                       Add

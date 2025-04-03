@@ -60,7 +60,7 @@ function App() {
               <Route index element={<Dashboard />} /> {/* Default child */}
               <Route path="users/list" element={<Users />} />
               <Route path="users/add" element={<UsersForm />} />
-              <Route path="ai-analysis" element={<AiAnalysis />} />
+              <Route path="aianalysis" element={<AiAnalysis />} />
 
               <Route path="doctors/list" element={<Doctors />} />
               <Route path="doctors/add" element={<DoctorsForm />} />
@@ -80,8 +80,8 @@ function App() {
               {/*}<Route path="appointments/delete/:id" element={<DeletePage />} /> */} 
               <Route path="messages" element={<Messages />} />
               <Route path="settings" element={<Settings />} />
-              <Route path="todays-preference" element={<TodaysPreference />} />
-              <Route path="my-doctor" element={<MyDoctor />} />
+              <Route path="todaypreference" element={<TodaysPreference />} />
+              <Route path="mydoctor" element={<MyDoctor />} />
               <Route path="profile" element={<Profile />} />
             </Route>
           </Routes>

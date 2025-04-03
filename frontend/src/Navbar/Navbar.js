@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Navbar, Nav, Container, Button } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
-import logoimg from '../assets/images/logo-hospital.png';
+import logoimg from '../assets/logo.png';
 import './Navbar.css'; 
 
 function CustomNavbar() {
@@ -11,8 +11,9 @@ function CustomNavbar() {
         <Navbar expand="lg" bg="light" variant="light" expanded={expanded} className="shadow-sm">
             <Container>
                 {/* Logo */}
-                <Navbar.Brand as={Link} to="/" onClick={() => setExpanded(false)}>
-                    <img src={logoimg} alt="E-health Logo" width="120" />
+                <Navbar.Brand className="d-flex align-items-center justify-space-between" as={Link} to="/" onClick={() => setExpanded(false)}>
+                    <img src={logoimg} alt="E-health Logo" width="50" />
+                    <h1>E-Health</h1>
                 </Navbar.Brand>
 
                 {/* Mobile Toggle Button */}
