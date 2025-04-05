@@ -1,29 +1,30 @@
+import React from 'react';
+import { Container, Row, Col, Card } from 'react-bootstrap';
+import { specialityData } from '../Data';
+import { Link } from 'react-router-dom';
 import './SpecialMenu.css';
-import { specialityData } from '../Data'
-import { Link } from 'react-router-dom'
 
 function SpecialityMenu() {
     return (
-        <section className="container-fluid" id='menu-special' >
-            <div className='container'>
-                <div className="specialitymenu-title">
-                    <h1 className='title-menu'>Find by Speciality</h1>
-                    <p>Simply browse through our extensive list of trusted doctors, schedule your appointment hassle-free.</p>
-                </div>
-                <div className="row" id='menu-img'>
-                    {
-                        specialityData.map((item, index) => {
-                            return (
-                                <Link key={index} to="/" className='col-6 col-md-2'>
-                                    <img src={item.image} alt='img-special' className='img-fluid' />
-                                    <p>{item.speciality}</p>
-                                </Link>
-                            );
-                        })
-                    }
-                </div>
-            </div>
-        </section>
+        <Container className="py-5">
+            <h2 className="text-center mb-4">Find by Speciality</h2>
+            <p className="text-center mb-4">Browse our list of medical specialists and choose the right one for your needs.</p>
+            <Row className="menu-img"> 
+                {specialityData.map((item, index) => (
+                    <Col key={index} xs={6} md={4} lg={2} className="mb-3 menu-item">
+                        <Link to="/" className="text-decoration-none">
+                            <Card className="text-center border-0 shadow-sm p-3">
+                                <Card.Img variant="top" src={item.image} alt={item.speciality} className="img-fluid" />
+                                <Card.Body>
+                                    <Card.Title as="h5">{item.speciality}</Card.Title>
+                                </Card.Body>
+                            </Card>
+                        </Link>
+                    </Col>
+                ))}
+            </Row>
+        </Container>
     );
 }
-export default SpecialityMenu
+
+export default SpecialityMenu;

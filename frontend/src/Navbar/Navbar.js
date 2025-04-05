@@ -1,47 +1,49 @@
 import React, { useState } from 'react';
-import './Navbar.css'; // Importing the CSS file
-import '../Data'
-// import logo
-import logoimg from '../assets/images/logo-hospital.png';
+import { Navbar, Nav, Container, Button } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
-function Navbar() {
+import logoimg from '../assets/logo.png';
+import './Navbar.css'; 
 
-    const [isOpen, setIsOpen] = useState(false);
+function CustomNavbar() {
+    const [expanded, setExpanded] = useState(false);
 
     return (
-        <section className='container-fluid g-0'>
-            <div className='container'>
-                <nav className="navbar">
-                    <div className="navbar-container">
-                        {/* Logo */}
-                        <div className="logo">
-                            <img src={logoimg} alt="Hospital Logo" />
-                        </div>
+        <Navbar expand="lg" bg="light" variant="light" expanded={expanded} className="shadow-sm">
+            <Container>
+                {/* Logo */}
+                <Navbar.Brand className="d-flex align-items-center justify-space-between" as={Link} to="/" onClick={() => setExpanded(false)}>
+                    <img src={logoimg} alt="E-health Logo" width="50" />
+                    <h1>E-Health</h1>
+                </Navbar.Brand>
 
-                        {/* Nav Links */}
-                        <ul className={isOpen ? "nav-links active" : "nav-links"}>
-                            <li><Link to="/">Home</Link></li>
-                            <li><Link to="/About">About us</Link></li>
-                            <li><Link to="/AllDoctors">All Doctors</Link></li>
-                            <li><Link to="/Contact">Contact</Link></li>
-                        </ul>
-                        {/* Create Account Button */}
-                        <div className="create-account rounded-pill ">
-                            <Link to="/Register" className="btn text-white fs-6">Create Account</Link>
-                        </div>
+                {/* Mobile Toggle Button */}
+                <Navbar.Toggle 
+                    aria-controls="basic-navbar-nav" 
+                    onClick={() => setExpanded(expanded ? false : true)} 
+                />
 
-                        {/* Toggle Button for Mobile */}
-                        <div className="toggle-btn" onClick={() => setIsOpen(!isOpen)}>
-                            <span className="bar"></span>
-                            <span className="bar"></span>
-                            <span className="bar"></span>
-                        </div>
-                    </div>
-                </nav>
-            </div>
-        </section>
+                {/* Nav Links */}
+                <Navbar.Collapse id="basic-navbar-nav">
+                    <Nav className="ms-auto">
+                        <Nav.Link as={Link} to="/" onClick={() => setExpanded(false)}>Home</Nav.Link>
+                        <Nav.Link as={Link} to="/About" onClick={() => setExpanded(false)}>About Us</Nav.Link>
+                        <Nav.Link as={Link} to="/AllDoctors" onClick={() => setExpanded(false)}>All Doctors</Nav.Link>
+                        <Nav.Link as={Link} to="/Contact" onClick={() => setExpanded(false)}>Contact</Nav.Link>
+                    </Nav>
+                    {/* Create Account Button */}
+                    <Button 
+                        as={Link} 
+                        to="/Register" 
+                        variant="primary" 
+                        className="rounded-pill ms-3"
+                        onClick={() => setExpanded(false)}
+                    >
+                        Create Account
+                    </Button>
+                </Navbar.Collapse>
+            </Container>
+        </Navbar>
     );
-};
+}
 
-export default Navbar;
-
+export default CustomNavbar;

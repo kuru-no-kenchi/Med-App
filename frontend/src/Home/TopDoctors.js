@@ -1,48 +1,28 @@
-// import { doctors } from "../Data";
-import { useContext } from "react";
-import { Link } from "react-router-dom";
-import "./TopDoctors.css"
-import { AppContext } from "../Context/AppContext";
+import React from 'react';
+import { Container, Row, Col, Card, Button } from 'react-bootstrap';
+import { doctors } from '../Data';
+import './TopDoctors.css';
 
 function TopDoctors() {
-
-    const { doctors } = useContext(AppContext)
-
     return (
-
-        <>
-            <section className="container-fluid" id='top-doctors' >
-                <div className='container'>
-                    <div className="Doctors-title">
-                        <h1 className=''>Top Doctors to Book</h1>
-                        <p>Simply browse through our extensive list of trusted doctors..</p>
-                    </div>
-                    <div className="row" id="doctor-card-container">
-                        {
-                            doctors.slice(0, 4).map((item, index) => {
-                                return (
-                                    <div key={index} className="col-12 col-md-5 col-lg-3" id="doctor-card">
-                                        <img src={item.image} alt="docimg" className="img-fluid" />
-                                        <div className="doctor-info">
-                                            <div className="available">
-                                                <p></p><p>Available</p>
-                                            </div>
-                                            <p className="doctor-name">{item.name}</p>
-                                            <p className="doctor-speciality">{item.speciality}</p>
-                                        </div>
-                                    </div>
-                                );
-                            })
-                        }
-                    </div>
-                    <div className="more-btn">
-                        <Link to="/AllDoctors"  className="btn rounded-pill">
-                            <button className="btn rounded-pill">More</button>
-                        </Link>
-                    </div>
-                </div>
-            </section>
-        </>
+        <Container className="py-5">
+            <h2 className="text-center mb-4">Top Rated Doctors</h2>
+            <Row>
+                {doctors.map((doctor, index) => (
+                    <Col key={index} md={4} lg={3} className="mb-4">
+                        <Card className="shadow-sm text-center p-3">
+                            <Card.Img variant="top" src={doctor.image} className="rounded-circle mx-auto" style={{ width: "100px", height: "100px" }} />
+                            <Card.Body>
+                                <Card.Title>{doctor.name}</Card.Title>
+                                <Card.Text>{doctor.speciality}</Card.Text>
+                                <Button variant="primary" href={`/doctor/${doctor.id}`}>View Profile</Button>
+                            </Card.Body>
+                        </Card>
+                    </Col>
+                ))}
+            </Row>
+        </Container>
     );
 }
+
 export default TopDoctors;

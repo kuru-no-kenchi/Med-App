@@ -79,13 +79,15 @@ const Register = () => {
                 required
               />
             </Form.Group>
+            {/*
             <GoogleOAuthProvider clientId="241668708417-3dc28teo3kjfimk837i3v45q8gsmuvkh.apps.googleusercontent.com">
       <GoogleLogin
         onSuccess={handleGoogleSuccess}
         onError={() => console.log("Login Failed")}
       />
     </GoogleOAuthProvider>
-{/*}
+ */}
+            
             <Form.Group className="mb-3">
               <Form.Label>Account Type</Form.Label>
               <Form.Select
@@ -96,10 +98,13 @@ const Register = () => {
                 <option value="Patient">Patient</option>
               </Form.Select>
             </Form.Group>
-*/}   
-            <Button variant="success" type="submit" className="w-100">
+
+            <Button variant="success" type="submit" href="/login" className="w-100">
               Register
             </Button>
+            <h6 className="mt-2">
+            Already Registered ! sign in here <a href="/login" > Login</a>
+          </h6>
           </Form>
         </Card.Body>
       </Card>

@@ -1,6 +1,6 @@
 import React from "react";
 import { Container, Row, Col, Card,Table, Badge, ListGroup } from "react-bootstrap";
-import { Hospital, Calendar2Check, PersonCheck, ClipboardHeart,Bell, Cart, CheckCircle, XCircle } from "react-bootstrap-icons";
+import { Hospital, Calendar2Check, PersonCheck, ClipboardHeart,Bell,Chat, Person, CheckCircle, XCircle } from "react-bootstrap-icons";
 import Chart from "react-apexcharts";
 
 
@@ -92,16 +92,18 @@ const Dashboard = () => {
     },
   };
 
-  const products = [
-    { id: 1, name: "Headphone", status: "Pending", price: "$10", icon: <Cart size={20} /> },
-    { id: 2, name: "Iphone 6", status: "Cancel", price: "$10", icon: <Cart size={20} /> },
-    { id: 3, name: "Jacket", status: "Success", price: "$10", icon: <Cart size={20} /> },
-    { id: 4, name: "Sofa", status: "Cancel", price: "$10", icon: <Cart size={20} /> },
+  const users = [
+    { id: 1, name: "amine Zahri", status: "Pending", type:"Admin", icon: <Person size={20} /> },
+    { id: 1, name: "ziane", status: "Pending", type:"Admin", icon: <Person size={20} /> },
+    { id: 1, name: "louazna", status: "Rejected", type:"Doctor", icon: <Person size={20} /> },
+    { id: 1, name: "oussama", status: "Approved", type:"Assistant", icon: <Person size={20} /> },
+    { id: 1, name: "omar", status: "Rejected", type:"Patient", icon: <Person size={20} /> },
+    
   ];
 
-  const feeds = [
+  const activites = [
     { id: 1, message: "You have 3 pending tasks.", icon: <Bell size={18} />, time: "Just Now" },
-    { id: 2, message: "New order received", icon: <Cart size={18} />, time: "30 min ago" },
+    { id: 2, message: "New Message", icon: <Chat size={18} />, time: "30 min ago" },
     { id: 3, message: "You have 4 tasks Done.", icon: <CheckCircle size={18} />, time: "30 min ago" },
     { id: 4, message: "You have 3 pending tasks.", icon: <Bell size={18} />, time: "Just Now" },
   ];
@@ -152,32 +154,32 @@ const Dashboard = () => {
 </Row>
 
       <Row className="mt-5 w-100">
-        {/* Table - New Products */}
+        {/* Table - New users */}
         <Col >
           <Card className="shadow-sm">
-            <Card.Header as="h5">New Products</Card.Header>
+            <Card.Header as="h5">New users</Card.Header>
             <Card.Body>
               <Table responsive bordered hover>
                 <thead>
                   <tr>
-                    <th>Product</th>
+                    <th>user</th>
                     <th>Status</th>
-                    <th>Price</th>
+                    <th>type</th>
                     <th>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {products.map((product) => (
-                    <tr key={product.id}>
+                  {users.map((user) => (
+                    <tr key={user.id}>
                       <td>
-                        {product.icon} {product.name}
+                        {user.icon} {user.name}
                       </td>
                       <td>
-                        <Badge bg={product.status === "Success" ? "success" : product.status === "Pending" ? "warning" : "danger"}>
-                          {product.status}
+                        <Badge bg={user.status === "Approved" ? "success" : user.status === "Pending" ? "warning" : "danger"}>
+                          {user.status}
                         </Badge>
                       </td>
-                      <td>{product.price}</td>
+                      <td>{user.type}</td>
                       <td>
                         <CheckCircle size={20} color="green" className="me-2" />
                         <XCircle size={20} color="red" />
@@ -196,7 +198,7 @@ const Dashboard = () => {
             <Card.Header as="h5">Feeds</Card.Header>
             <Card.Body>
               <ListGroup variant="flush">
-                {feeds.map((feed) => (
+                {activites.map((feed) => (
                   <ListGroup.Item key={feed.id} className="d-flex justify-content-between align-items-center">
                     <div>
                       {feed.icon} {feed.message}

@@ -8,6 +8,7 @@ import Home from './Home/Home.js';
 import About from './About/About.js';
 import AllDoctors from './AllDoctors/AllDoctors.js';
 import Contact from './Contact/Contact.js';
+import DoctorProfile from './DoctorProfile/DoctorProfile.js';
 
 // Import Admin Components
 import AdminLayout from './admin/AdminLayout.js';
@@ -48,6 +49,7 @@ function App() {
             <Route path="/About" element={<About />} />
             <Route path="/AllDoctors" element={<AllDoctors />} />
             <Route path="/doctors" element={<AllDoctors />} />
+            <Route path="/doctor/:id" element={<DoctorProfile />} />
             <Route path="/doctors/:speciality" element={<AllDoctors />} />
             <Route path="/Contact" element={<Contact />} />
             <Route path="/login" element={<Login />} />
@@ -58,7 +60,7 @@ function App() {
               <Route index element={<Dashboard />} /> {/* Default child */}
               <Route path="users/list" element={<Users />} />
               <Route path="users/add" element={<UsersForm />} />
-              <Route path="ai-analysis" element={<AiAnalysis />} />
+              <Route path="aianalysis" element={<AiAnalysis />} />
 
               <Route path="doctors/list" element={<Doctors />} />
               <Route path="doctors/add" element={<DoctorsForm />} />
@@ -78,8 +80,8 @@ function App() {
               {/*}<Route path="appointments/delete/:id" element={<DeletePage />} /> */} 
               <Route path="messages" element={<Messages />} />
               <Route path="settings" element={<Settings />} />
-              <Route path="todays-preference" element={<TodaysPreference />} />
-              <Route path="my-doctor" element={<MyDoctor />} />
+              <Route path="todaypreference" element={<TodaysPreference />} />
+              <Route path="mydoctor" element={<MyDoctor />} />
               <Route path="profile" element={<Profile />} />
             </Route>
           </Routes>

@@ -93,6 +93,9 @@ const Login = () => {
             <Button variant="primary" type="submit" className="w-100">
               Login
             </Button>
+            <h6 className="mt-2">
+            A new User ! sign up here <a href="/register" > Register</a>
+          </h6>
           </Form>
         </Card.Body>
       </Card>

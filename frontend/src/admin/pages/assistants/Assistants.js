@@ -5,7 +5,14 @@ import AssistantsForm from "./AssistantsForm";
 import { getAssistants, createAssistant, updateAssistant, deleteAssistant } from "./api_assistant";
 
 const Assistants = () => {
-  const [assistants, setAssistants] = useState({}); // Store assistants as an object
+
+  const defaultAssistants = {
+    1: { id: 1, full_name: "Amine Zahi", email: "amine.zahi@example.com", experience: "5 years", hosp_name: "City Hospital" },
+    2: { id: 2, full_name: "Sohaile Ziane", email: "sohaile.ziane@example.com", experience: "3 years", hosp_name: "General Clinic" },
+    3: { id: 3, full_name: "Mohamed Ridouani", email: "mohamed.ridouani@example.com", experience: "7 years", hosp_name: "Health Center" },
+    4: { id: 4, full_name: "Hossam Louazna", email: "hossam.louazna@example.com", experience: "6 years", hosp_name: "Medical Hub" },
+  };
+  const [assistants, setAssistants] = useState(defaultAssistants) // Store assistants as an object
   const [showForm, setShowForm] = useState(false);
   const [editAssistant, setEditAssistant] = useState(null);
 
