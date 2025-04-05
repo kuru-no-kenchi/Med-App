@@ -282,13 +282,32 @@ class AppointmentListCreateView(APIView):
         appointments = Appointment.objects.all()
         serializer = AppointmentSerializer(appointments, many=True)
         return Response(serializer.data)
-
     def post(self, request):
-        serializer = AppointmentSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
+        try:
+            app_doctor_id = request.data.get('app_doctor')
+            app_patient_id = request.data.get('app_patient')
+            # Get Doctor and Patient instances
+            doctor = Doctor.objects.get(pk=app_doctor_id)
+            patient = Patient.objects.get(pk=app_patient_id)
+            # Create appointment using validated doctor and patient
+            appointment = Appointment.objects.create(
+                app_doctor=doctor,
+                app_patient=patient,
+                app_date=request.data.get('app_date'),
+                app_time=request.data.get('app_time'),
+                app_aprv=request.data.get('app_aprv', False),
+                app_done=request.data.get('app_done', False),
+            )
+            serializer = AppointmentSerializer(appointment)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except Doctor.DoesNotExist:
+            return Response({"error": "Doctor not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        except Patient.DoesNotExist:
+            return Response({"error": "Patient not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
     
     
 class AppointmentDetailView(APIView):

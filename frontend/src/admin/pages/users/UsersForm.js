@@ -2,12 +2,12 @@ import React, { useState, useEffect } from "react";
 import { Form, Button } from "react-bootstrap";
 const UsersForm = ({ user, onSave, onCancel }) => {
   const [formData, setFormData] = useState({
-    user_id:"",
+    user_id: "",
     first_name: "",
-    last_name:"",
+    last_name: "",
     email: "",
     date_joined: new Date().toISOString().split("T")[0],
-    role:"",
+    role: "",
   });
 
   useEffect(() => {
@@ -19,7 +19,7 @@ const UsersForm = ({ user, onSave, onCancel }) => {
         email: user.email,
         date_joined: user.date_joined?.split("T")[0],
         role: user.role,
-    });
+      });
     }
   }, [user]);
 
@@ -35,17 +35,9 @@ const UsersForm = ({ user, onSave, onCancel }) => {
     e.preventDefault();
     onSave(formData);
   };
-  
+
   return (
     <Form onSubmit={handleSubmit}>
-        <Form.Group className="mb-3">
-          <Form.Label>ID</Form.Label>
-          <Form.Control
-          type="text"
-          name="user_id"
-          value={formData.user_id}
-           />
-        </Form.Group>
       <Form.Group className="mb-3">
         <Form.Label>First Name</Form.Label>
         <Form.Control
@@ -56,14 +48,14 @@ const UsersForm = ({ user, onSave, onCancel }) => {
           required
         />
         <Form.Group className="mb-3">
-        <Form.Label>Last Name</Form.Label>
-        <Form.Control
-          type="text"
-          name="last_name"
-          value={formData.last_name}
-          onChange={handleChange}
-          required
-        />
+          <Form.Label>Last Name</Form.Label>
+          <Form.Control
+            type="text"
+            name="last_name"
+            value={formData.last_name}
+            onChange={handleChange}
+            required
+          />
         </Form.Group>
       </Form.Group>
       <Form.Group className="mb-3">
@@ -95,12 +87,12 @@ const UsersForm = ({ user, onSave, onCancel }) => {
           onChange={handleChange}
           required
         >
-          <option value="Admin">Admin</option>
-          <option value="Doctor">Doctor</option>
-          <option value="Patient">Patient</option>
-          <option value="Assistant">Assistant</option>
+          <option value="admin">Admin</option>
+          <option value="doctor">Doctor</option>
+          <option value="patient">Patient</option>
+          <option value="assistant">Assistant</option>
         </Form.Control>
-      </Form.Group> 
+      </Form.Group>
       <Button variant="primary" type="submit" className="me-2">
         Save
       </Button>

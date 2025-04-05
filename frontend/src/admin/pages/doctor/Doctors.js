@@ -2,12 +2,11 @@ import React, { useEffect, useState } from "react";
 import { Container, Table, Button, Modal } from "react-bootstrap";
 import { PencilSquare, Trash } from "react-bootstrap-icons";
 import DoctorsForm from "./DoctorsForm";
-import { getUsers } from "../users/api_users";
-import { getdoctors, createDoctor, updateDoctor, deleteDoctor } from "./api_doctors";
+import { getdoctors, updateDoctor, deleteDoctor } from "./api_doctors";
 import axios from "axios";
 
 const Doctors = () => {
-  const [doctors, setDoctors] = useState({});
+  const [doctors, setDoctors] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [editDoctor, setEditDoctor] = useState(null);
 
@@ -18,12 +17,7 @@ const Doctors = () => {
     try {
       const response = await getdoctors();
       const data = response.data;
-      const doctorsObject = data.reduce((acc, doctor) => {
-        acc[doctor.id] = doctor;
-        return acc;
-      }, {});
-
-      setDoctors(doctorsObject);
+      setDoctors(data);
     } catch (error) {
       console.error("Error fetching doctors:", error);
       setDoctors({});
@@ -48,16 +42,28 @@ const Doctors = () => {
       console.error("Error saving doctor:", error.response ? error.response.data : error.message);
     }
   };
-
-  // Handle deleting a doctor
-  const handleDeleteDoctor = async (doc_id) => {
+  const handleUpdateDoctor = async (doctorData) => {
     try {
-      await deleteDoctor(doc_id);
-      setDoctors((prevDoctors) => {
-        const updatedDoctors = { ...prevDoctors };
-        delete updatedDoctors[doc_id];
-        return updatedDoctors;
-      });
+      await updateDoctor(editDoctor.id, doctorData);
+      setShowForm(false);
+      setEditDoctor(null);
+      getAllDoctors();
+    } catch (error) {
+      console.error("Error updating doctor:", error.response?.data || error.message);
+    }
+  };
+  const handleSaveDoctor = (doctorData) => {
+    if (editDoctor) {
+      handleUpdateDoctor(doctorData);
+    } else {
+      handleCreateDoctor(doctorData);
+    }
+  };
+  // Handle deleting a doctor
+  const handleDeleteDoctor = async (id) => {
+    try {
+      await deleteDoctor(id);
+      window.location.reload();
       alert("Doctor deleted successfully");
     } catch (error) {
       console.error("Error deleting doctor:", error);
@@ -83,12 +89,12 @@ const Doctors = () => {
         </thead>
         <tbody>
           {Object.values(doctors).map((doctor, index) => (
-            <tr key={doctor.doc_id}>
-              <td>{doctor.doc_id}</td>
+            <tr key={doctor.id}>
+              <td>{doctor.id}</td>
               <td>{doctor.full_name}</td> 
               <td>{doctor.email}</td>
-              <td>{doctor.doc_specialization}</td>
-              <td>{doctor.doc_license_number}</td>
+              <td>{doctor.specialization}</td>
+              <td>{doctor.license_number}</td>
               <td>
                 <Button
                   variant="warning"
@@ -98,7 +104,7 @@ const Doctors = () => {
                 >
                   <PencilSquare />
                 </Button>
-                <Button variant="danger" size="sm" onClick={() => handleDeleteDoctor(doctor.doc_id)}>
+                <Button variant="danger" size="sm" onClick={() => handleDeleteDoctor(doctor.id)}>
                   <Trash />
                 </Button>
               </td>
@@ -114,7 +120,7 @@ const Doctors = () => {
         <Modal.Body>
           <DoctorsForm
             doctor={editDoctor}
-            onSave={handleCreateDoctor}
+            onSave={handleSaveDoctor}
             onCancel={() => setShowForm(false)}
           />
         </Modal.Body>

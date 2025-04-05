@@ -2,11 +2,11 @@ import React, { useEffect, useState } from "react";
 import { Container, Table, Button, Modal } from "react-bootstrap";
 import { PencilSquare, Trash } from "react-bootstrap-icons";
 import PatientsForm from "./PatientForm";
-import { getpatients,updatepatient } from "./api_patients";
+import { getpatients,updatepatient,deletepatient } from "./api_patients";
 import axios from "axios";
 
 const Patients = () => {
-  const [patients, setPatients] = useState({});
+  const [patients, setPatients] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [editPatient, setEditPatient] = useState(null);
 
@@ -19,13 +19,7 @@ const Patients = () => {
     try {
       const response = await getpatients();
       const data = response.data;
-      // Transform into an object
-      const patientsObject = data.reduce((acc, patient) => {
-        acc[patient.id] = patient;
-        return acc;
-      }, {});
-
-      setPatients(patientsObject);
+      setPatients(data);
     } catch (error) {
       console.error("Error fetching patients:", error);
       setPatients({});
@@ -70,19 +64,16 @@ const Patients = () => {
       }
     };  
   // Handle deleting a patient
-  const handleDeletePatient = async (id) => {
+  const handleDeletePatient = async (patient_id) => {
     try {
-      await axios.delete(`http://127.0.0.1:8000/patients/${id}/`);
-      setPatients((prevPatients) => {
-        const updatedPatients = { ...prevPatients };
-        delete updatedPatients[id];
-        return updatedPatients;
-      });
+      await deletepatient(patient_id);
+      window.location.reload();
+      alert("Patient deleted successfully");
     } catch (error) {
       console.error("Error deleting patient:", error);
     }
   };
-
+  
   return (
     <Container>
       <h2 className="my-3">Patients</h2>
@@ -103,7 +94,7 @@ const Patients = () => {
         </thead>
         <tbody>
           {Object.values(patients).map((patient, index) => (
-            <tr key={patient.id}>
+            <tr key={patient.patient_id}>
               <td>{index + 1}</td>
               <td>{patient.full_name}</td>
               <td>{patient.email}</td>
@@ -122,7 +113,7 @@ const Patients = () => {
                 >
                   <PencilSquare />
                 </Button>
-                <Button variant="danger" size="sm" onClick={() => handleDeletePatient(patient.id)}>
+                <Button variant="danger" size="sm" onClick={() => handleDeletePatient(patient.patient_id)}>
                   <Trash />
                 </Button>
               </td>

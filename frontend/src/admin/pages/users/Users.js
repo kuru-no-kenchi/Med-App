@@ -3,10 +3,10 @@ import { Container, Table, Button, Modal } from "react-bootstrap";
 import { PencilSquare, Trash } from "react-bootstrap-icons";
 import UsersForm from "./UsersForm";
 import axios from "axios";
-import { createUser,updateUser, getUsers,deleteUser } from "./api_users";
+import { updateUser, getUsers,deleteUser } from "./api_users";
 
 const Users = () => {
-  const [users, setUsers] = useState({}); // Store users as an object
+  const [users, setUsers] = useState([]); 
   const [showForm, setShowForm] = useState(false);
   const [editUser, setEditUser] = useState(null);
 
@@ -49,7 +49,7 @@ const Users = () => {
   };
       const handleUpdateUser = async (userData) => {
         try {
-          await updateUser(editUser.user_id, userData);
+          await updateUser(editUser.id, userData);
           setShowForm(false);
           setEditUser(null);
           handleAllUsers();
@@ -64,31 +64,6 @@ const Users = () => {
           handleCreateUser(userData);
         }
       };
-  const saveUser = async (userData) => {
-    try {
-      // Convert date to "YYYY-MM-DD" format
-      const formattedUserData = {
-        ...userData,
-        role: userData.role ? userData.role.toLowerCase() : null,
-        date_joined: userData.date_joined ? userData.date_joined.split("T")[0] : null, 
-      };
-      const response = await axios.post("http://127.0.0.1:8000/users/list/", formattedUserData, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      setShowForm(false); 
-      return response.data;
-    } catch (error) {
-      if (error.response) {
-        console.error("Backend error:", error.response.data);
-      } else {
-        console.error("Request failed:", error.message);
-      }
-      throw error;
-    }
-  };
-  
 
   const handleDeleteUser = async (id) => {
     try {
@@ -98,6 +73,7 @@ const Users = () => {
         delete updatedUsers[id];
         return updatedUsers;
       });
+      alert("User deleted successfully");
     } catch (error) {
       console.error("Error deleting user:", error);
     }

@@ -46,6 +46,7 @@ const PatientsForm = ({ patient, onSave, onCancel }) => {
           value={formData.patient_id}
           onChange={handleChange}
           required
+          disabled
         />
       </Form.Group>
       <Form.Group className="mb-3">

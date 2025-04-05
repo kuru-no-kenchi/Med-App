@@ -2,10 +2,11 @@ import React, { useEffect, useState } from "react";
 import { Container, Table, Button, Modal } from "react-bootstrap";
 import { PencilSquare, Trash } from "react-bootstrap-icons";
 import AppointmentsForm from "./AppointmentsForm";
-import { getAppointments, createAppointments, updateAppointments, deleteAppointments } from "./api_appointments";
+import axios from "axios";
+import { getAppointments, updateAppointments, deleteAppointments } from "./api_appointments";
 
 const Appointments = () => {
-  const [appointments, setAppointments] = useState({});
+  const [appointments, setAppointments] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [editAppointment, setEditAppointment] = useState(null);
 
@@ -18,48 +19,52 @@ const Appointments = () => {
     try {
       const response = await getAppointments();
       const data = response.data;
-      const appointmentsObject = data.reduce((acc, appointment) => {
-        acc[appointment.id] = appointment;
-        return acc;
-      }, {});
-      setAppointments(appointmentsObject);
+      setAppointments(data);
     } catch (error) {
       console.error("Error fetching appointments:", error);
       setAppointments({});
     }
   };
-
-  const handleSaveAppointment = async (appointmentData) => {
+  const handleCreateappointment = async (appointmentData) => {
     try {
-      if (editAppointment) {
-        await updateAppointments(editAppointment.id, appointmentData);
-        setAppointments((prevAppointments) => ({
-          ...prevAppointments,
-          [editAppointment.id]: { ...prevAppointments[editAppointment.id], ...appointmentData },
-        }));
-      } else {
-        const response = await createAppointments(appointmentData);
-        const newAppointment = response.data;
-        setAppointments((prevAppointments) => ({
-          ...prevAppointments,
-          [newAppointment.id]: newAppointment,
-        }));
-      }
+      const formattedappointmentData = {
+        ...appointmentData,
+        date_of_birth: appointmentData.date_of_birth?.split("T")[0] || null,
+      };
+
+      await axios.post("http://127.0.0.1:8000/appointments/list/", formattedappointmentData, {
+        headers: { "Content-Type": "application/json" },
+      });
+
       setShowForm(false);
-      setEditAppointment(null);
+      getAllAppointments();
     } catch (error) {
-      console.error("Error saving appointment:", error);
+      console.error("Error creating appointment:", error.response?.data || error.message);
     }
   };
-
+    // Handle updating an existing appointment (PUT)
+    const handleUpdateappointment = async (appointmentData) => {
+      try {
+        await updateAppointments(editAppointment.id, appointmentData);
+        setShowForm(false);
+        setEditAppointment(null);
+        getAllAppointments();
+      } catch (error) {
+        console.error("Error updating appointment:", error.response?.data || error.message);
+      }
+    };
+    const handleSaveappointment = (appointmentData) => {
+      if (editAppointment) {
+        handleUpdateappointment(appointmentData);
+      } else {
+        handleCreateappointment(appointmentData);
+      }
+    };  
   const handleDeleteAppointment = async (id) => {
     try {
       await deleteAppointments(id);
-      setAppointments((prevAppointments) => {
-        const updatedAppointments = { ...prevAppointments };
-        delete updatedAppointments[id];
-        return updatedAppointments;
-      });
+      alert("Appointment deleted successfully");
+      window.location.reload();
     } catch (error) {
       console.error("Error deleting appointment:", error);
     }
@@ -120,7 +125,7 @@ const Appointments = () => {
         <Modal.Body>
           <AppointmentsForm
             appointment={editAppointment}
-            onSave={handleSaveAppointment}
+            onSave={handleSaveappointment}
             onCancel={() => setShowForm(false)}
           />
         </Modal.Body>

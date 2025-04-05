@@ -63,11 +63,8 @@ const Assistants = () => {
   const handleDeleteAssistant = async (id) => {
     try {
       await deleteAssistant(id);
-      setAssistants((prevAssistants) => {
-        const updatedAssistants = { ...prevAssistants };
-        delete updatedAssistants[id]; // Remove the assistant with the given ID
-        return updatedAssistants;
-      });
+      window.location.reload();
+      alert("Assistant deleted successfully");
     } catch (error) {
       console.error("Error deleting assistant:", error);
     }

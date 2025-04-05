@@ -3,21 +3,25 @@ import { Form, Button } from "react-bootstrap";
 
 const DoctorsForm = ({ doctor, onSave, onCancel }) => {
   const [formData, setFormData] = useState({
-    doc_id:"",
+    id: "",   
     full_name: "",
-    doc_email: "",
-    specialty: "",
-    license_number: "",
+    email: "", 
+    specialization: "", 
+    hospital_name: "",
+    experience: "", 
+    license_number: ""
   });
 
   useEffect(() => {
     if (doctor) {
       setFormData({
-        doc_id : doctor.doc_id,
-        full_name: doctor.full_name || "",
-        doc_email: doctor.email || "",
-        specialty: doctor.doc_specialization || "",
-        license_number: doctor.doc_license_number || "",
+        id: doctor.id,
+        full_name: doctor.full_name,
+        email: doctor.email,
+        specialization: doctor.specialization,
+        hospital: doctor.hospital_name,
+        experience: doctor.experience,
+        license_number: doctor.license_number
     });
     }
   }, [doctor]);
@@ -37,15 +41,16 @@ const DoctorsForm = ({ doctor, onSave, onCancel }) => {
 
   return (
     <Form onSubmit={handleSubmit}>
-            <Form.Group className="mb-3">
-        <Form.Label>ID</Form.Label>
-        <Form.Control
-          type="text"
-          name="doc_id"
-          value={formData.doc_id}
-          onChange={handleChange}
-          required
-        />
+      <Form.Group className="mb-3">
+              <Form.Label>ID</Form.Label>
+                <Form.Control
+                  type="text"
+                  name="id"       
+                  value={formData.id}
+                  onChange={handleChange}
+                  required
+                  readOnly
+                />
       </Form.Group>
       <Form.Group className="mb-3">
         <Form.Label>Full Name</Form.Label>
@@ -61,8 +66,8 @@ const DoctorsForm = ({ doctor, onSave, onCancel }) => {
         <Form.Label>Email</Form.Label>
         <Form.Control
           type="text"
-          name="doc_email"
-          value={formData.doc_email}
+          name="email"
+          value={formData.email}
           onChange={handleChange}
           required
         />
@@ -71,10 +76,9 @@ const DoctorsForm = ({ doctor, onSave, onCancel }) => {
         <Form.Label>Specialty</Form.Label>
         <Form.Control
           type="text"
-          name="specialty"
-          value={formData.specialty}
+          name="specialization"
+          value={formData.specialization}
           onChange={handleChange}
-          required
         />
       </Form.Group>
       <Form.Group className="mb-3">
@@ -84,7 +88,15 @@ const DoctorsForm = ({ doctor, onSave, onCancel }) => {
           name="license_number"
           value={formData.license_number}
           onChange={handleChange}
-          required
+        />
+      </Form.Group>
+      <Form.Group className="mb-3">
+        <Form.Label>Hospital</Form.Label>
+        <Form.Control
+          type="text"
+          name="hospital_name"
+          value={formData.hospital_name}
+          onChange={handleChange}
         />
       </Form.Group>
       <Form.Group className="mb-3">

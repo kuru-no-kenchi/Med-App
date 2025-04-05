@@ -41,17 +41,35 @@ class MessageSerializer(serializers.ModelSerializer):
         model = Message
         fields = ['sender_name','email_sender','receiver_name','email_receiver','content','timestamp']
 ##############################################################################
+# serializers.py
 class DoctorSerializer(serializers.ModelSerializer):
-    doc_id = serializers.IntegerField(source='user.id',read_only=True)
-    full_name = serializers.CharField(source='user.get_full_name')
-    hosp_name = serializers.CharField(source='hospital_name')
-    doc_experience = serializers.IntegerField(source='experience')
-    doc_license_number = serializers.CharField(source='license_number',required=False)
-    doc_specialization = serializers.CharField(source='specialization')
-    email = serializers.CharField(source='user.email')
+    id = serializers.IntegerField(source="user.id")
+    full_name = serializers.CharField(source='user.get_full_name', required=False)
+    email = serializers.EmailField(source='user.email', required=False)
     class Meta:
         model = Doctor
-        fields = [ 'doc_id','full_name', 'hosp_name', 'doc_experience', 'doc_license_number', 'doc_specialization', 'email']
+        fields = ['id', 'full_name', 'email', 'specialization', 'hospital_name', 'experience', 'license_number']
+        extra_kwargs = {
+            'email': {'required': True},
+            'license_number': {'required': True}  
+        }
+    def update(self, instance, validated_data):
+        user_data = validated_data.pop('user', {})
+        # Update Doctor fields
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        # Update User fields
+        user = instance.user
+        if 'email' in user_data:
+            user.email = user_data['email']
+        if 'get_full_name' in user_data:
+            # Implement name splitting logic if needed
+            first_name, last_name = user_data['get_full_name'].split(' ', 1)
+            user.first_name = first_name
+            user.last_name = last_name
+        user.save()
+        instance.save()
+        return instance
 ###################################################################################  
 class CustomUserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -70,9 +88,11 @@ class AssistantSerializer(serializers.ModelSerializer):
         fields = ['ass_id','first_name','last_name','hosp_name','experience',"email"]
 ###########################################################################""
 class AppointmentSerializer(serializers.ModelSerializer):
-    doctor_name = serializers.CharField(read_only=True)
-    patient_name = serializers.CharField(read_only=True) 
+    doctor_name = serializers.CharField(source='app_doctor.user.get_full_name')
+    patient_name = serializers.CharField(source='app_patient.user.get_full_name') 
 
     class Meta:
         model = Appointment
-        fields = ['id', 'doctor_name', 'patient_name', 'app_date', 'app_time', 'app_aprv', 'app_done']
+        fields = ['id', 'doctor_name','app_doctor','app_patient', 'patient_name', 'app_date', 'app_time', 'app_aprv', 'app_done']
+    def create(seld,validated_data):
+        Appointment.objects.create(**validated_data)
