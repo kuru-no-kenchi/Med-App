@@ -1,39 +1,46 @@
 import React, { useState } from "react";
 import { Form, Button, Container, Card } from "react-bootstrap";
-import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
 import axios from "axios";  // Import axios for API requests
-
+import { useNavigate,Navigate } from "react-router-dom";
+import { useAuth } from "../../Context/AuthContext";
 const Register = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [accountType, setAccountType] = useState("User");
   const [message, setMessage] = useState("");  // Store success/error messages
+  const { authData } = useAuth(); // Access authentication data from context
+
+  const navigate = useNavigate(); // Initialize useNavigate hook
+
+  if(!authData){
+      return null;
+    }
+    if (authData.accessToken) {
+      return <Navigate to="/dashboard" />;
+    }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+  
     try {
-      const response = await axios.post("http://127.0.0.1:8000/auth/register/", {
+      const response = await axios.post("http://127.0.0.1:8000/auth/register", {
         name,
         email,
         password,
+        role: accountType,  // Send the selected account type as the 'role'
       });
+   console.log(response.data.message);
+      setMessage(response.data.message);
+      navigate("/login"); // Redirect to login page after successful registration
 
-      setMessage(response.data.message);  // Display success message
     } catch (error) {
+      console.log(error.response?.data?.error || "An error occurred");
       setMessage(error.response?.data?.error || "An error occurred");
     }
   };
-  const handleGoogleSuccess = async (response) => {
-    const token = response.credential;
-
-    try {
-      const res = await axios.post("http://127.0.0.1:8000/auth/register/", { token });
-      console.log(res.data);
-    } catch (error) {
-      console.error("Google Login Failed:", error.response?.data);
-    }
-  };
+  
+ 
 
   return (
     <Container className="d-flex justify-content-center align-items-center vh-100">
@@ -47,6 +54,7 @@ const Register = () => {
           {message && <p className="text-center text-danger">{message}</p>}
 
           <Form onSubmit={handleSubmit}>
+          {message && <p className="text-danger text-center">{message}</p>}
             <Form.Group className="mb-3">
               <Form.Label>Full Name</Form.Label>
               <Form.Control
@@ -99,7 +107,7 @@ const Register = () => {
               </Form.Select>
             </Form.Group>
 
-            <Button variant="success" type="submit" href="/login" className="w-100">
+            <Button variant="success" type="submit"  className="w-100">
               Register
             </Button>
             <h6 className="mt-2">

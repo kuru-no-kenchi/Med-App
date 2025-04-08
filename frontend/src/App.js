@@ -1,8 +1,11 @@
 import './App.css';
 import '../node_modules/bootstrap/dist/css/bootstrap.min.css';
 import '../node_modules/bootstrap/dist/js/bootstrap.bundle.js';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes,Navigate, Route } from 'react-router-dom';
 
+
+import {PrivateRoutes,RoleBasedRoute} from './components/PrivateRoute.js';
+import Unauthorized from './components/Unauthorized.js';
 // Import Components
 import Home from './Home/Home.js';
 import About from './About/About.js';
@@ -35,59 +38,113 @@ import AssistantsForm from './admin/pages/assistants/AssistantsForm.js';
 // Import App Context
 import AppContextProvider from './Context/AppContext.js';
 
+
 function App() {
-  return (
+  return ( 
+  
     <div className="App">
       <BrowserRouter>
         <AppContextProvider>
+         
           <Routes>
             {/* Public Routes */}
           <Route path="/" element={<HomeLayout />} >
 
             <Route  index element={<Home />} />
             <Route  path="/Home" element={<Home />} />
+            <Route path="/unauthorized" element={<Unauthorized />} />
             <Route path="/About" element={<About />} />
             <Route path="/AllDoctors" element={<AllDoctors />} />
             <Route path="/doctors" element={<AllDoctors />} />
             <Route path="/doctor/:id" element={<DoctorProfile />} />
             <Route path="/doctors/:speciality" element={<AllDoctors />} />
             <Route path="/Contact" element={<Contact />} />
+          
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            
+            
+            
           </Route>
             {/* Admin Routes with Nested Routing */}
-            <Route path="/admin" element={<AdminLayout />}>
+            <Route element={<PrivateRoutes />} > {/* Private Route for Admin */}
+            <Route path="/Dashboard" element={<AdminLayout />}>
               <Route index element={<Dashboard />} /> {/* Default child */}
-              <Route path="users/list" element={<Users />} />
-              <Route path="users/add" element={<UsersForm />} />
-              <Route path="aianalysis" element={<AiAnalysis />} />
 
-              <Route path="doctors/list" element={<Doctors />} />
-              <Route path="doctors/add" element={<DoctorsForm />} />
-              <Route path="doctors/edit/:id" element={<DoctorsForm />} />
-              {/** <Route path="doctors/delete/:id" element={<DeletePage />} />*/}
-              <Route path="patients/list" element={<Patients />} />
-              <Route path="patients/add" element={<PatientsForm />} />
-              <Route path="patients/edit/:id" element={<PatientsForm />} />
-              {/*}<Route path="patientss/delete/:id" element={<DeletePage />} />*/}
-              <Route path="assistants/list" element={<Assistants />} />
-              <Route path="assistants/add" element={<AssistantsForm />} />
-              <Route path="assistants/edit/:id" element={<AssistantsForm />} />
-              {/*}<Route path="assistants/delete/:id" element={<DeletePage />} /> */}
+
+              {                /* General Routes*/}
+              <Route path="messages" element={<Messages />} />
+              <Route path="settings" element={<Settings />} />
+              <Route path="profile" element={<Profile />} />
+
+
+
+              {/* Doctor & patient & assistant Common Routes */}
+            <Route element={<RoleBasedRoute AllowedRole={['doctor','patient','assistant']}/>} >
+
+              <Route path="aianalysis" element={<AiAnalysis />} />
               <Route path="appointments/list" element={<Appointments />} />
               <Route path="appointments/add" element={<AppointmentsForm />} />
               <Route path="appointments/edit/:id" element={<AppointmentsForm />} />
-              {/*}<Route path="appointments/delete/:id" element={<DeletePage />} /> */} 
-              <Route path="messages" element={<Messages />} />
-              <Route path="settings" element={<Settings />} />
-              <Route path="todaypreference" element={<TodaysPreference />} />
-              <Route path="mydoctor" element={<MyDoctor />} />
-              <Route path="profile" element={<Profile />} />
+
             </Route>
+
+
+
+              {/* Doctor * Assistant Common Routes */}
+            <Route element={<RoleBasedRoute AllowedRole= {['doctor','assistant']} />} >
+              <Route path="todayspreference" element={<TodaysPreference />} />
+              <Route path="patients/list" element={<Patients />} />
+              <Route path="patients/edit/:id" element={<PatientsForm />} />
+            </Route>
+              
+
+              
+
+              {/* Doctor & Admin Routes */}
+            <Route element={<RoleBasedRoute AllowedRole= {['admin','doctor']} />} >
+
+              <Route path="assistants/list" element={<Assistants />} />
+              <Route path="assistants/edit/:id" element={<AssistantsForm />} />
+
+            </Route>
+
+              {/* Patient Routes */}
+
+            <Route element={<RoleBasedRoute AllowedRole= {['patient',]} />} >
+              <Route path="mydoctor" element={<MyDoctor />} />
+              </Route>
+
+              {/* admin Routes */}
+
+
+            <Route element={<RoleBasedRoute AllowedRole= {['admin',]} />} >
+            
+              <Route path="users/list" element={<Users />} />
+              <Route path="users/add" element={<UsersForm />} />
+              <Route path="doctors/list" element={<Doctors />} />
+              <Route path="doctors/edit/:id" element={<DoctorsForm />} />
+
+            </Route>
+              {/** <Route path="doctors/delete/:id" element={<DeletePage />} />*/}
+
+              {/*}<Route path="patientss/delete/:id" element={<DeletePage />} />*/}
+
+              {/*}<Route path="assistants/delete/:id" element={<DeletePage />} /> */}
+
+              {/*}<Route path="appointments/delete/:id" element={<DeletePage />} /> */} 
+             
+            </Route>
+            </Route>
+             <Route path="*" element={<Navigate  to={"/"}/>} />  
+           
           </Routes>
+         
+          {/* <Footer /> */}
         </AppContextProvider>
       </BrowserRouter>
     </div>
+     
   );
 }
 

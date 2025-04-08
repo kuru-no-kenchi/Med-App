@@ -11,6 +11,7 @@ class AuthView(APIView):
         data = request.data  # Get JSON data from request
         email = data.get('email')
         password = data.get('password')
+        role = data.get('role', 'patient')  # Default role is 'patient'
 
         # Check if all fields are provided
         if not email or not password:
@@ -21,7 +22,7 @@ class AuthView(APIView):
             return Response({"error": "Email already registered"}, status=status.HTTP_400_BAD_REQUEST)
 
         # Create user and hash password automatically
-        user = CustomUser.objects.create_user(email=email, password=password)
+        user = CustomUser.objects.create_user(email=email, password=password, role=role)
 
         return Response(
             {"message": "User created successfully"},

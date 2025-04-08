@@ -5,17 +5,28 @@ from django.contrib.auth.models import AbstractUser, BaseUserManager # type: ign
 
 class Users_Manager(BaseUserManager):
     """Custom user manager for handling user creation."""
-    
+
     def create_user(self, email, password=None, **extra_fields):
-        """Creates and returns a regular user with the given email and password."""
         if not email:
-            raise ValueError('Users must have an email address')
+            raise ValueError("Users must have an email address")
         email = self.normalize_email(email)
-        user = self.model(email=email, **extra_fields)
+
+        # Optional: fallback for username if not supplied
+        username = extra_fields.get("username") or extra_fields.get("name", "")
+        
+        # Set the default role to 'patient' if not provided in extra_fields
+        role = extra_fields.pop('role', 'patient')  # Pop role out so it's not passed twice
+
+        user = self.model(
+            email=email,
+            username=username,
+            role=role,  # Only set role here
+            **extra_fields
+        )
         user.set_password(password)
         user.save(using=self._db)
         return user
-
+    
     def create_superuser(self, email, password, **extra_fields):
         """Creates and returns a superuser with admin privileges."""
         extra_fields.setdefault('is_staff', True)

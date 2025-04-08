@@ -48,8 +48,7 @@ const DoctorsForm = ({ doctor, onSave, onCancel }) => {
                   name="id"       
                   value={formData.id}
                   onChange={handleChange}
-                  required
-                  readOnly
+                  
                 />
       </Form.Group>
       <Form.Group className="mb-3">

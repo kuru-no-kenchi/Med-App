@@ -6,9 +6,9 @@ import axios from "axios";
 import { getAppointments, updateAppointments, deleteAppointments } from "./api_appointments";
 
 const Appointments = () => {
-<<<<<<< HEAD
-  const [appointments, setAppointments] = useState([]);
-=======
+
+  
+
   const defaultAppointments = {
     1: { id: 1, doctor_name: "Dr. Amine Zahi", patient_name: "John Doe", app_date: "2025-04-10", app_time: "10:00 AM", app_aprv: true, app_done: false },
     2: { id: 2, doctor_name: "Dr. Sohaile Ziane", patient_name: "Jane Smith", app_date: "2025-04-12", app_time: "02:30 PM", app_aprv: true, app_done: true },
@@ -16,7 +16,7 @@ const Appointments = () => {
     4: { id: 4, doctor_name: "Dr. Hossam Louazna", patient_name: "Robert Wilson", app_date: "2025-04-18", app_time: "03:45 PM", app_aprv: true, app_done: false },
   };
   const [appointments, setAppointments] = useState(defaultAppointments);
->>>>>>> 5268d506321b933dcbb3e1b6673aa4b229e28a19
+
   const [showForm, setShowForm] = useState(false);
   const [editAppointment, setEditAppointment] = useState(null);
 

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import Stack from "react-bootstrap/Stack";
 import Container from "react-bootstrap/Container";
 import Button from "react-bootstrap/Button";
@@ -19,36 +19,90 @@ import {
   ChatDots,
   Robot
 } from "react-bootstrap-icons";
+import axios from "axios";
+import {useAuth} from "../../Context/AuthContext.js";
 
 const Sidebar = ({ collapsed, setCollapsed }) => {
   // Non-Dropdown Sections
+
+  const {authData} = useAuth();
+   
+
+
+  const handleLogOut=()=>{
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("refresh_token");
+    Navigate("/login");
+  }
   const Sections = [
-    { name: "Home", icon: <House size={20} />, link: "/admin" },
-    { name: "Profile", icon: <Person size={20} />, link: "/admin/profile" },
+    { name: "Home", icon: <House size={20} />, link: "/dashboard" },
+    { name: "Profile", icon: <Person size={20} />, link: "/dashboard/profile" },
    
   ];
 
   // Additional Sections (Settings, Messages, Logout)
   const ExtraSections = [
-    { name: "Settings", icon: <Gear size={20} />, link: "/admin/settings" },
-    { name: "Messages", icon: <Envelope size={20} />, link: "/admin/messages" },
-    { name: "Logout", icon: <BoxArrowRight size={20} />, link: "/admin/logout" }
+    { name: "Settings", icon: <Gear size={20} />, link: "/dashboard/settings" },
+    { name: "Messages", icon: <Envelope size={20} />, link: "/dashboard/messages" },
+
   ];
 
+  if(!authData){
+    return null;
+  }
+
   // Manage Sections
-  const ManageSections = [
+  var Role=authData.userProfile === null ? "user" : authData.userProfile.role.toLowerCase() // Default to "User" if role is not available
+  console.log(authData);
+  var ManageSections=[]
+
+  switch(Role){
+  case "admin":
+     ManageSections = [
     { name: "Users", icon: <People size={20} />, },
-    { name: "My Doctor", icon: <ChatDots size={20} />, link: "/admin/my-doctor" },
-    { name: "AI Analysis", icon: <Robot size={20} />, link: "/admin/aianalysis" },
     { name: "Doctors", icon: <People size={20} /> },
     { name: "Patients", icon: <People size={20} /> },
     { name: "Assistants", icon: <People size={20} /> },
-    { name: "Appointments", icon: <Calendar size={20} />, link: "/admin/appointments" },
-    { name: "Today's Preference", icon: <Calendar size={20} />, link: "/admin/todayspreference" }
+
   ];
+  break;
+  
+  case "doctor":
+    ManageSections = [
+      { name: "Patients", icon: <People size={20} />, link: "/dashboard/patients/list" },
+      { name: "Appointments", icon: <Calendar size={20} />, link: "/dashboard/appointments/list" },
+      { name: "Today's Preference", icon: <Calendar size={20} />, link: "/dashboard/todayspreference" },
+      { name: "AI Analysis", icon: <Robot size={20} />, link: "/dashboard/aianalysis" },
+    ];
+    break;
+
+  case "assistant" :
+    ManageSections = [
+      { name: "My Doctor", icon: <ChatDots size={20} />, link: "/dashboard/my-doctor" },
+      { name: "Appointments", icon: <Calendar size={20} />, link: "/dashboard/appointments/list" },
+      { name: "Today's Preference", icon: <Calendar size={20} />, link: "/dashboard/todayspreference" }
+    ];
+    break;
+
+  case "patient":
+    ManageSections = [
+      { name: "My Doctor", icon: <ChatDots size={20} />, link: "/dashboard/my-doctor" },
+      { name: "Appointments", icon: <Calendar size={20} />, link: "/dashboard/appointments/list" },
+      { name: "AI Analysis", icon: <Robot size={20} />, link: "/dashboard/aianalysis" },
+
+    ];
+    break;
+  default:
+    Navigate("/login");
+    console.log("you have undefined Role: " + Role);
+     // Redirect to login if role is not recognized
+    break;
+}
+  
 
 
   return (
+    
     <Container fluid className="d-flex w-25 flex-direction-column">
       {/* Sidebar */}
       <div
@@ -102,16 +156,11 @@ const Sidebar = ({ collapsed, setCollapsed }) => {
                 <Accordion.Body className="ps-4">
                   <div className=" p-2 d-flex align-items-center">
                     <List size={18} className="me-2" />
-                    <Link to={`/admin/${section.name.toLowerCase()}/list`} className="text-decoration-none text-dark">
+                    <Link to={section.link} className="text-decoration-none text-dark">
                       List
                     </Link>
                   </div>
-                  <div className=" p-2 d-flex align-items-center">
-                    <Plus size={18} className="me-2" />
-                    <Link to={`/admin/${section.name.toLowerCase()}/add`} className="text-decoration-none text-dark">
-                      Add
-                    </Link>
-                  </div>
+                  
                 </Accordion.Body>
               </Accordion.Item>
             ))}
@@ -123,9 +172,11 @@ const Sidebar = ({ collapsed, setCollapsed }) => {
             <OverlayTrigger
               key={item.name}
               placement="right"
-              overlay={<Tooltip id={`tooltip-${item.name}`}>{item.name}</Tooltip>}
+              overlay={<Tooltip id={`tooltip-${item.name}`}>{item.name}</Tooltip>
+
+            }
             >
-              <Link to={item.link} className="text-decoration-none text-dark">
+              <Link  to={item.link} className="text-decoration-none text-dark">
                 <div className="sidebar-item p-2 d-flex align-items-center">
                   <div className="me-3">{item.icon}</div>
                   {!collapsed && (
@@ -137,6 +188,24 @@ const Sidebar = ({ collapsed, setCollapsed }) => {
               </Link>
             </OverlayTrigger>
           ))}
+           <OverlayTrigger
+              key={"Logout"}
+              placement="right"
+              overlay={<Tooltip id={`tooltip-Logout`}>{"LogOut"}</Tooltip>
+
+            }
+            >
+              <Link  onClick={handleLogOut} className="text-decoration-none text-dark">
+                <div className="sidebar-item p-2 d-flex align-items-center">
+                  <div className="me-3">{<BoxArrowRight size={20} />}</div>
+                  {!collapsed && (
+                    <div className="d-flex align-items-center justify-content-between w-100">
+                      <span>{"LogOut"}</span>
+                    </div>
+                  )}
+                </div>
+              </Link>
+            </OverlayTrigger>
         </Stack>
       </div>
     </Container>

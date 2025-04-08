@@ -108,6 +108,7 @@ const Dashboard = () => {
     { id: 4, message: "You have 3 pending tasks.", icon: <Bell size={18} />, time: "Just Now" },
   ];
   return (
+   
     <Container fluid className="p-3 d-flex justify-content-center align-items-center flex-column">
       <h1>Welcome Admin!</h1>
       <p className="ms-2">This Dashboard is managed by zahri04</p>

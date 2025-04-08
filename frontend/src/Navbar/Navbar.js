@@ -1,11 +1,52 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Navbar, Nav, Container, Button } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
+import { Link,Navigate } from 'react-router-dom';
 import logoimg from '../assets/logo.png';
 import './Navbar.css'; 
+import { useAuth } from '../Context/AuthContext.js';
 
 function CustomNavbar() {
     const [expanded, setExpanded] = useState(false);
+    const[showButton, setShowButton] = useState(
+        {
+            to:"/Register",
+            text:"Create Account",
+        }
+    );
+    const { authData } = useAuth();// Access the authData from context
+    
+   
+    
+
+
+    useEffect(() => { 
+        
+        if (authData && authData.accessToken) {
+            setShowButton({
+                to: "/dashboard",
+                text: "Dashboard",
+            });
+        } else {
+            setShowButton({
+                to: "/Register",
+                text: "Create Account",
+            });
+        }
+
+
+
+
+
+     },[authData])
+
+
+
+
+    
+
+if(!authData){
+        return null;
+    }
 
     return (
         <Navbar expand="lg" bg="light" variant="light" expanded={expanded} className="shadow-sm">
@@ -33,12 +74,12 @@ function CustomNavbar() {
                     {/* Create Account Button */}
                     <Button 
                         as={Link} 
-                        to="/Register" 
+                        to={showButton.to} 
                         variant="primary" 
                         className="rounded-pill ms-3"
                         onClick={() => setExpanded(false)}
                     >
-                        Create Account
+                        {showButton.text}
                     </Button>
                 </Navbar.Collapse>
             </Container>

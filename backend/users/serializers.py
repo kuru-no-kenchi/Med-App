@@ -71,11 +71,39 @@ class DoctorSerializer(serializers.ModelSerializer):
         instance.save()
         return instance
 ###################################################################################  
+# serializers.py
 class CustomUserSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True, required=True)
+    account_type = serializers.ChoiceField(
+        choices=CustomUser.ROLE_CHOICES, write_only=True, source='role'
+    )
+    name = serializers.CharField(write_only=True)
+
     class Meta:
         model = CustomUser
-        date_joined = serializers.DateTimeField(source='user.date_joined',format="%Y-%m-%d")
-        fields = ["id", "first_name","last_name", "email", "role","date_joined"]
+        fields = [
+            "id", "email", "password", "name", "account_type",
+            "first_name", "last_name", "role", "date_joined"
+        ]
+        read_only_fields = ["id", "role", "date_joined"]
+
+    def create(self, validated_data):
+        email = validated_data["email"]
+        password = validated_data["password"]
+        name = validated_data["name"]
+        role = validated_data["role"]
+
+        # Optionally split name
+        username = name
+
+        user = CustomUser.objects.create_user(
+            email=email,
+            password=password,
+            username=username,
+            role=role
+        )
+        return user
+
 ###################################################################################""        
 class AssistantSerializer(serializers.ModelSerializer):
     ass_id = serializers.IntegerField(source="user.id")

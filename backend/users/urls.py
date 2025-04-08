@@ -7,6 +7,7 @@ urlpatterns = [
     # admin Endpoints
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('api/profile/', user_profile_view),
     path('users/list/', UserListCreateView.as_view(), name='user-list'),
     path('users/<int:pk>/', UserDetailView.as_view(), name='user-detail'),
     path('doctors/list/', DoctorListCreateView.as_view(), name='doctor-list'),
@@ -26,6 +27,7 @@ urlpatterns = [
     # Doctor Endpoints
     path('doctor/accept_appointment/<int:appointment_id>/', DoctorView.as_view(), name='accept_appointment'),
     path('doctor/reject_appointment/<int:appointment_id>/', DoctorView.as_view(), name='reject_appointment'),
+    path('doctors/grouped/', doctors_grouped_by_speciality, name='doctors-grouped'),
     path('doctor/patient/<int:patient_id>/', DoctorView.as_view(), name='patient_info'),
     path('doctor/appointment/<int:appointment_id>/', DoctorView.as_view(), name='app_details'),
     path('doctor/<str:action>/',DoctorView.as_view(), name='doctor-action'),
@@ -36,7 +38,5 @@ urlpatterns = [
     # Assistant Endpoints
     path('assistant/<str:action>/', AssistantView.as_view(), name='assistant-action'),
     
-    path('dashboard/doctor/', doctor_dashboard, name='doctor_dashboard'),
-    path('dashboard/patient/', patient_dashboard, name='patient_dashboard'),
-    path('dashboard/assistant/', assistant_dashboard, name='assistant_dashboard'),
+    
 ]
